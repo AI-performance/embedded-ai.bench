@@ -29,7 +29,7 @@ function prepare_env {
     fi
     export ANDROID_NDK=${ANDROID_NDK_HOME}
 
-    cd - > /dev/null
+    cd -
 }
 
 # download code repo from github

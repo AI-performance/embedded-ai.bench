@@ -2,9 +2,9 @@
 set -x
 
 function prepare_env {
-    # attr, curl, wget, unzip
+    # attr, wget, unzip
     apt update
-    apt install -y --no-install-recommends attr curl wget unzip
+    apt install -y --no-install-recommends attr wget unzip
 
     # cmake
     if [ ! -f "/opt/cmake-3.10/bin/cmake"]; then

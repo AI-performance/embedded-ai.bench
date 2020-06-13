@@ -1,4 +1,5 @@
-#set -e
+#!/bin/bash
+set -x
 
 #SERIAL_NUM_LIST="7f1446bd" # 845
 #serial_num="17c3cc34" # 855

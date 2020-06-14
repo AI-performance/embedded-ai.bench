@@ -1,9 +1,84 @@
 #!/usr/bin/python
 
 from datetime import datetime
+import time
 import os
+import re
 
 DEBUG = False
+
+def pattern_match(text, a, b, contain_a_b=False):
+    reg_exp = r'%s(.*?)%s' % (a, b)
+    if contain_a_b:
+        reg_exp = r'(%s.*%s)' % (a, b)
+    m = re.search(reg_exp, text)
+    if m:
+        return m.group(1)
+    return ""
+
+
+def get_cpu_max_freqs(serial_num):
+    check_cpu_num_cmd = "adb -s {} shell cat /proc/cpuinfo | grep processor".format(serial_num)
+    cmd_handle = run_cmd(check_cpu_num_cmd)
+    cpu_num = len(cmd_handle.readlines())
+    check_cpu_max_freq_cmd_pattern = "adb -s {} shell cat /sys/devices/system/cpu/cpu{}/cpufreq/cpuinfo_max_freq"
+    cmds = map(lambda cpu_idx: check_cpu_max_freq_cmd_pattern.format(serial_num, cpu_idx), range(cpu_num))
+
+    try:
+        cmd_handles = run_cmds(cmds)
+        #print cmd_handles[cmds[0]].readline()
+        cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
+    except IndexError:
+        print("cat: /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: Permission denied")
+        print("replacing scaling_max_freq with cpuinfo_max_freq")
+        cmds = map(lambda c: c.replace("cpuinfo", "scaling"), cmds)
+
+        cmd_handles = run_cmds(cmds)
+        #print cmd_handles[cmds[0]].readline().strip()
+        cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
+    if DEBUG: print cpu_max_freqs
+    return cpu_max_freqs 
+
+
+def get_some_freq_idx(freq, serial_num):
+    some_freq_idx_list = []
+    cpu_max_freqs = get_cpu_max_freqs(serial_num)
+    for idx, f in enumerate(cpu_max_freqs):
+        if f == freq:
+            some_freq_idx_list.append(str(idx))
+    return some_freq_idx_list
+
+
+# benchmark config
+def create_config(framework_name):
+    benchmark_platform = ["android-armv8"]
+    config = dict()
+    if framework_name == "tnn":
+        config['device_work_dir'] ="/data/local/tmp/ai-performance/{}".format(framework_name)
+        config['framework_name'] = framework_name
+        config['benchmark_platform'] = benchmark_platform
+        for pidx in range(len(benchmark_platform)):
+            platform = benchmark_platform[pidx]
+            config[platform] = dict()
+            config[platform]['shared_lib'] = "./tnn/scripts/build{}/libTNN.so".format(32 if "v7" in platform else 64)
+            #config[platform]['benchmark_bin'] = "./tnn/scripts/build32/test/benchmark/TNNBench"
+            config[platform]['benchmark_bin'] = "./tnn/scripts/build{}/test/TNNTest".format(32 if "v7" in platform else 64)
+        config['repeats'] = 10
+        config['warmup'] = 2
+        config['support_backend'] = ["ARM", "OPENCL"]
+        config["cpu_thread_num"] = [1, 2, 4]
+        config["power_mode"] = "big_cores" #"big_cores" # "little_cores", "no_bind"
+        config['benchmark_cmd_pattern'] = 'adb -s {serial_num} shell "export LD_LIBRARY_PATH={device_work_dir}; {device_benchmark_bin} -mt {model_type} -mp {model_dir} -dt {backend} -ic {repeats} -wc {warmup} -th {thread_num} -dl {bind_cpu_idx}"'
+    else:
+        print("Unsupported framework_name: {}".format(framework_name))
+        exit(1)
+    return config
+
+
+def set_config(config, key, value):
+    config[key] = value
+    return config
+
 
 def run_cmds(cmds, is_adb_cmd=False):
     cmd_handles = dict()
@@ -13,28 +88,34 @@ def run_cmds(cmds, is_adb_cmd=False):
         cmd_type = "ADB CMD" if is_adb_cmd else "CMD"
         print("{}{}> {}".format(current_time, cmd_type, cmd))
         cmd_handles[cmd] = os.popen(cmd)
+        # TODO(ysh329): wait shell finish, not a good method
+        time.sleep(0.1)
     return cmd_handles
 
 
-def prepare_models():
-    cmds = list()
-    clone_models_cmd = "git clone https://gitee.com/yuens/tnn-models.git"
-    cmds.append(clone_models_cmd)
+def run_cmd(cmd, cmd_type="CMD"):
+    print("{}> {}".format(cmd_type, cmd))
+    cmd_handle = os.popen(cmd)
+    return cmd_handle
 
-    lookup_models_path_cmd = "realpath ./tnn-models/*tnn*"
-    cmds.append(lookup_models_path_cmd)
+
+def prepare_models(config):
+    cmds = list()
+    framework_name = config['framework_name']
+    clone_models_cmd = "git clone https://gitee.com/yuens/{}-models.git".format(framework_name)
+    lookup_models_path_cmd = "realpath ./{}-models/*{}*".format(framework_name, framework_name)
+    cmds.extend([clone_models_cmd, lookup_models_path_cmd])
 
     cmd_handles = run_cmds(cmds)
-
     models_dir = map(lambda path: path.strip(), cmd_handles[lookup_models_path_cmd].readlines())
 
     model_dict = dict()
     for midx in range(len(models_dir)):
-        print("{} {}".format(midx, models_dir[midx]))
+        if DEBUG: print("{} {}".format(midx, models_dir[midx]))
         model_dir = models_dir[midx]
         file_type = model_dir.split(".")[-1]
         model_name = model_dir.split("/")[-1].replace("." + file_type, "").replace(file_type, "")
-        print(model_name, file_type)
+        if DEBUG: print(model_name, file_type)
         if "proto" in model_dir: # filter proto files
             model_dict[model_name] = model_dir
     if DEBUG: print(models_dir)
@@ -42,7 +123,7 @@ def prepare_models():
     return model_dict
 
 
-def prepare_devices():
+def prepare_devices(config):
     adb_devices_cmd = "adb devices"
     cmd_handles = run_cmds([adb_devices_cmd])
     serial_num_list = cmd_handles[adb_devices_cmd].readlines()[1:]
@@ -58,19 +139,41 @@ def prepare_devices():
         device_status = serial_num_line[1]
         device_dict[device_serial_num] = dict()
         device_dict[device_serial_num]['status'] = device_status
+        device_dict[device_serial_num]['cpu_max_freqs'] = get_cpu_max_freqs(device_serial_num)
+        cpu_max_freqs = get_cpu_max_freqs(device_serial_num)
+        big_cores_idx = get_some_freq_idx(max(get_cpu_max_freqs(device_serial_num)), device_serial_num)
+        big_cores_idx_str = ",".join(big_cores_idx)
+        little_cores_idx = get_some_freq_idx(min(get_cpu_max_freqs(device_serial_num)), device_serial_num)
+        little_cores_idx_str = ",".join(little_cores_idx)
+        device_dict[device_serial_num]['big_cores_idx'] = big_cores_idx_str
+        device_dict[device_serial_num]['little_cores_idx'] = little_cores_idx_str
+        if config["power_mode"] == "big_cores":
+            device_dict[device_serial_num]['bind_cpu_idx'] = big_cores_idx_str
+        elif config["power_mode"] == "little_cores":
+            device_dict[device_serial_num]['bind_cpu_idx'] = little_cores_idx_str
+        elif config["power_mode"] == "no_bind":
+            device_dict[device_serial_num]['bind_cpu_idx'] = ",".join(map(str, range(len(cpu_max_freqs))))
+        else:
+            print("Unsupported power_mode:{}".format(config["power_mode"]))
+            exit(1)
 
-        # ro.board.platform, ro.board.chiptype
-        device_platform_cmd = "adb -s {} shell getprop | grep 'cpu_info_display'".format(device_serial_num)
+        # ro.board.platform, ro.board.chiptype, ro.board.hardware
+        device_platform_cmd = "adb -s {} shell getprop | grep 'ro.board.platform'".format(device_serial_num)
         cmd_handls = run_cmds([device_platform_cmd])
-        soc = cmd_handls[device_platform_cmd].readlines()[0].split(": ")[1].strip().replace("[", "").replace("]", "")
+        soc = cmd_handls[device_platform_cmd].readlines()[0]
+        soc = soc.split(": ")[1].strip().replace("[", "").replace("]", "")
         device_dict[device_serial_num]["soc"] = soc
 
     if DEBUG: print(device_dict)
+    assert(len(device_dict) > 0)
     return device_dict
 
 
-def prepare_models_for_devices(model_dict, device_dict, device_work_dir="/data/local/tmp/ai-performance/"):
-    device_work_dir = device_work_dir + "/tnn/"
+def prepare_models_for_devices(config):
+    device_work_dir = config['device_work_dir']
+    device_dict = config['device_dict']
+    model_dict = config['model_dict']
+
     device_serials = device_dict.keys()
     model_names = model_dict.keys()
 
@@ -89,13 +192,179 @@ def prepare_models_for_devices(model_dict, device_dict, device_work_dir="/data/l
             if DEBUG: print([push_proto_cmd, push_param_cmd])
 
     run_cmds(cmds)
+    return 0
+
+
+# assets: benchmark_bin, benchmark_lib
+def prepare_benchmark_assets_for_devices(config):
+    benchmark_platform = config['benchmark_platform']
+    device_work_dir = config["device_work_dir"]
+    model_dict = config["model_dict"]
+    device_dict = config["device_dict"]
+    device_serials = device_dict.keys()
+    model_names = model_dict.keys()
+
+    cmds = list()
+    for didx in range(len(device_serials)):
+        device_serial = device_serials[didx]
+        for pidx in range(len(benchmark_platform)):
+            platform = benchmark_platform[pidx]
+            device_work_dir_platform = device_work_dir + "/" + platform #+ "/"
+            # benchmark assets
+            benchmark_bin = config[platform]['benchmark_bin']
+            benchmark_lib = config[platform]['shared_lib']
+
+            rmdir_cmd = "adb -s {} shell rm -rf {}".format(device_serial, device_work_dir_platform)
+            mkdir_cmd = "adb -s {} shell mkdir -p {}".format(device_serial, device_work_dir_platform)
+            benchmark_lib_device_path = device_work_dir_platform + "/" + os.path.basename(benchmark_lib)
+            benchmark_bin_device_path = device_work_dir_platform + "/" + os.path.basename(benchmark_bin)
+
+            push_shared_lib_cmd = "adb -s {} push {} {}".format(device_serial, benchmark_lib, benchmark_lib_device_path)
+            push_benchmark_bin_cmd = "adb -s {} push {} {}".format(device_serial, benchmark_bin, benchmark_bin_device_path)
+            chmod_x_bin_cmd = "adb -s {} shell chmod +x {}".format(device_serial, benchmark_bin_device_path)
+
+            cmds.extend([rmdir_cmd, mkdir_cmd, push_shared_lib_cmd, push_benchmark_bin_cmd, chmod_x_bin_cmd])
+
+    run_cmds(cmds)
+    return 0
+
+
+def benchmark(config):
+    device_work_dir = config["device_work_dir"]
+    device_dict = config["device_dict"]
+    model_dict = config["model_dict"]
+
+    warmup = config["warmup"]
+    repeats = config["repeats"]
+
+    device_serials = device_dict.keys()
+    model_names = model_dict.keys()
+
+    benchmark_platform = config["benchmark_platform"]
+    support_backend = config["support_backend"]
+    benchmark_cmd_pattern = config['benchmark_cmd_pattern']
+    bench_dict = dict()
+    cmds = list()
+    for didx in range(len(device_serials)):
+        device_serial_num = device_serials[didx]
+        for pidx in range(len(benchmark_platform)):
+            platform = benchmark_platform[pidx]
+            device_work_dir_platform = device_work_dir + "/" + platform #+ "/"
+            device_benchmark_bin = "/".join([device_work_dir_platform,
+                                             os.path.basename(config[platform]['benchmark_bin'])])
+            for midx in range(len(model_names)):
+                model_name = model_names[midx]
+                model_dir = "/".join([device_work_dir, os.path.basename(model_dict[model_name])])
+                for bidx in range(len(support_backend)):
+                    backend = support_backend[bidx]
+                    is_cpu = lambda b: b == "CPU" or b == "ARM"                  
+                    for tidx in range(len(config['cpu_thread_num']) if is_cpu(backend) else 1):
+                        cpu_thread_num = config['cpu_thread_num'][tidx]
+                        benchmark_cmd = benchmark_cmd_pattern.format(**{"serial_num": device_serial_num,
+                                                                        "device_work_dir": device_work_dir_platform,
+                                                                        "device_benchmark_bin": device_benchmark_bin,
+                                                                        "model_type": config['framework_name'].upper(),
+                                                                        "model_dir": model_dir,
+                                                                        "backend": backend,
+                                                                        "repeats": config['repeats'],
+                                                                        "warmup": config['warmup'],
+                                                                        "thread_num": cpu_thread_num,
+                                                                        "bind_cpu_idx": device_dict[device_serial_num]['bind_cpu_idx']})
+                        cmd_handle = run_cmd(benchmark_cmd)
+                        perf_dict = parse_benchmark(cmd_handle)
+                        # summarize benchmark info
+                        bench_dict[model_name] = []
+                        bench_record = {"soc": device_dict[device_serial_num]['soc'],
+                                        "serial_num": device_serial_num,
+                                        "platform": platform,
+                                        "model_name": model_name,
+                                        "repeats": config['repeats'],
+                                        "warmup": config['warmup'],
+                                        "avg": perf_dict["avg"],
+                                        "max": perf_dict["max"],
+                                        "min": perf_dict["min"],
+                                        "backend": backend,
+                                        "cpu_thread_num": cpu_thread_num,
+                                        "power_mode": config["power_mode"],
+                                        "bind_cpu_idx": device_dict[device_serial_num]["bind_cpu_idx"],
+                                        "cpu_max_freqs": device_dict[device_serial_num]["cpu_max_freqs"],
+                                        "cmd": benchmark_cmd}
+                        bench_dict[model_name].append(bench_record)
+                        print(bench_record)
+                        cmds.append(benchmark_cmd)
+    return bench_dict
+
+
+def generate_benchmark_summary(bench_dict):
+    print("=============== {} ===============".format(generate_benchmark_summary.__name__))
+    summary_header = ["model_name", "platform", "soc", "power_mode", "backend", "cpu_thread_num", "avg", "max", "min"]
+    summary_header_str = ",".join(summary_header)
+    summary = [summary_header_str]
+
+    model_names = bench_dict.keys()
+    for midx in range(len(model_names)):
+        model_name = model_names[midx]
+        bench_records = bench_dict[model_name]
+        for ridx in range(len(bench_records)):
+            record_dict = bench_records[ridx]
+            print(record_dict)
+            record = [record_dict["model_name"],
+                      record_dict["platform"],
+                      record_dict["soc"],
+                      record_dict["power_mode"],
+                      record_dict["backend"],
+                      record_dict["cpu_thread_num"],
+                      record_dict["avg"],
+                      record_dict["max"],
+                      record_dict["min"]]
+            record_str = ",".join(map(str, record))
+            if True: print(record_str)
+            summary.append(record_str)
+    return summary
+
+def benchmark_sum(bench_dict):
+    pass
+
+
+def parse_benchmark(cmd_handle):
+    output_lines = cmd_handle.readlines()
+    if DEBUG: print(output_lines)
+    assert(len(output_lines) == 1)
+    benchmark = dict()
+    line = output_lines[0].split()
+    if DEBUG: print(line)
+    line = "".join(line)
+    if DEBUG: print(line)
+    benchmark["min"] = pattern_match(line, "min=", "ms", False)
+    benchmark["max"] = pattern_match(line, "max=", "ms", False)
+    benchmark["avg"] = pattern_match(line, "avg=", "ms", False)
+    assert(len(benchmark) != 0)
+    return benchmark
+
+ 
+def clean_env_for_devices(config):
+    pass
+    # NOTE(ysh329): give clean work to prepares'
 
 
 def main():
     # TODO(ysh329): add args for backend / threads / powermode / armeabi etc.
-    model_dict = prepare_models()
-    device_dict = prepare_devices()
-    prepare_models_for_devices(model_dict, device_dict)
+
+    config_dict = create_config("tnn")
+    model_dict = prepare_models(config_dict)
+    device_dict = prepare_devices(config_dict)
+    config_dict = set_config(config_dict, "model_dict", model_dict)
+    config_dict = set_config(config_dict, "device_dict", device_dict)
+
+    clean_env_for_devices(config_dict)
+    prepare_models_for_devices(config_dict)
+    prepare_benchmark_assets_for_devices(config_dict)
+
+    bench_dict = benchmark(config_dict)
+    summary_list = generate_benchmark_summary(bench_dict)
+    summary_str = "\n".join(summary_list)
+    print(summary_str)
+    return 0
 
 
 if __name__ == "__main__":

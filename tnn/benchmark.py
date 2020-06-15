@@ -36,8 +36,9 @@ def get_cpu_max_freqs(serial_num):
         cmd_handles = run_cmds(cmds)
         #print cmd_handles[cmds[0]].readline().strip()
         cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
-    if DEBUG: print cpu_max_freqs
-    return cpu_max_freqs 
+    cpu_max_freqs_ghz = map(lambda freq: float(freq) / 1e6, cpu_max_freqs)
+    if DEBUG: print cpu_max_freqs_ghz
+    return cpu_max_freqs_ghz
 
 
 def get_some_freq_idx(freq, serial_num):
@@ -252,15 +253,18 @@ def benchmark(config):
     bench_case_idx = 0
     for didx in range(len(device_serials)):
         device_serial_num = device_serials[didx]
-        for pidx in range(len(benchmark_platform)):
-            platform = benchmark_platform[pidx]
-            device_work_dir_platform = device_work_dir + "/" + platform
-            device_benchmark_bin = "/".join([device_work_dir_platform,
-                                             os.path.basename(config[platform]['benchmark_bin'])])
-            for midx in range(len(model_names)):
-                model_name = model_names[midx]
-                model_dir = "/".join([device_work_dir, os.path.basename(model_dict[model_name])])
-                bench_dict[model_name] = []
+
+        for midx in range(len(model_names)):
+            model_name = model_names[midx]
+            model_dir = "/".join([device_work_dir, os.path.basename(model_dict[model_name])])
+            bench_dict[model_name] = []
+
+            for pidx in range(len(benchmark_platform)):
+                platform = benchmark_platform[pidx]
+                device_work_dir_platform = device_work_dir + "/" + platform
+                device_benchmark_bin = "/".join([device_work_dir_platform,
+                                                 os.path.basename(config[platform]['benchmark_bin'])])
+
                 for bidx in range(len(support_backend)):
                     backend = support_backend[bidx]
                     is_cpu = lambda b: b == "CPU" or b == "ARM"                  

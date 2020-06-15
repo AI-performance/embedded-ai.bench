@@ -26,7 +26,7 @@ def get_cpu_max_freqs(serial_num):
 
     try:
         cmd_handles = run_cmds(cmds)
-        #print cmd_handles[cmds[0]].readline()
+        #print(cmd_handles[cmds[0]].readline())
         cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
     except IndexError:
         print("cat: /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: Permission denied")
@@ -34,10 +34,10 @@ def get_cpu_max_freqs(serial_num):
         cmds = map(lambda c: c.replace("cpuinfo", "scaling"), cmds)
 
         cmd_handles = run_cmds(cmds)
-        #print cmd_handles[cmds[0]].readline().strip()
+        #print(cmd_handles[cmds[0]].readline().strip())
         cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
     cpu_max_freqs_ghz = map(lambda freq: float(freq) / 1e6, cpu_max_freqs)
-    if DEBUG: print cpu_max_freqs_ghz
+    if DEBUG: print(cpu_max_freqs_ghz)
     return cpu_max_freqs_ghz
 
 
@@ -121,7 +121,7 @@ def prepare_models(config):
         if "proto" in model_dir: # filter proto files
             model_dict[model_name] = model_dir
     if DEBUG: print(models_dir)
-    if DEBUG: print model_dict
+    if DEBUG: print(model_dict)
     return model_dict
 
 
@@ -161,11 +161,20 @@ def prepare_devices(config):
             exit(1)
 
         # ro.board.platform, ro.board.chiptype, ro.board.hardware
-        device_platform_cmd = "adb -s {} shell getprop | grep 'ro.board.platform'".format(device_serial_num)
-        cmd_handls = run_cmds([device_platform_cmd])
-        soc = cmd_handls[device_platform_cmd].readlines()[0]
+        device_soc_cmd = "adb -s {} shell getprop | grep 'ro.board.platform'".format(device_serial_num)
+        cmd_handls = run_cmds([device_soc_cmd])
+        soc = cmd_handls[device_soc_cmd].readlines()[0]
         soc = soc.split(": ")[1].strip().replace("[", "").replace("]", "")
         device_dict[device_serial_num]["soc"] = soc
+        if DEBUG: print(soc)
+
+        # product
+        device_product_cmd = "adb -s {} shell getprop | grep 'ro.product.model'".format(device_serial_num)
+        cmd_handle = run_cmd(device_product_cmd)
+        product = cmd_handle.readlines()[0]
+        product = product.split(": ")[1].strip().replace("[", "").replace("]", "")
+        device_dict[device_serial_num]["product"] = product
+        if DEBUG: print(product)
 
     if DEBUG: print(device_dict)
     assert(len(device_dict) > 0)
@@ -286,6 +295,7 @@ def benchmark(config):
                         perf_dict = parse_benchmark(cmd_handle)
                         # summarize benchmark info
                         bench_record = {"soc": device_dict[device_serial_num]['soc'],
+                                        "product": device_dict[device_serial_num]['product'],
                                         "serial_num": device_serial_num,
                                         "platform": platform,
                                         "model_name": model_name,
@@ -307,7 +317,7 @@ def benchmark(config):
 
 def generate_benchmark_summary(bench_dict, is_print_summary=True):
     print("=============== {} ===============".format(generate_benchmark_summary.__name__))
-    summary_header = ["model_name", "platform", "soc", "power_mode", "backend", "cpu_thread_num", "avg", "max", "min"]
+    summary_header = ["model_name", "platform", "soc", "power_mode", "backend", "cpu_thread_num", "avg", "max", "min", "repeats", "warmup"]
     summary_header_str = ",".join(summary_header)
     summary = [summary_header_str]
 
@@ -323,12 +333,15 @@ def generate_benchmark_summary(bench_dict, is_print_summary=True):
             record = [record_dict["model_name"],
                       record_dict["platform"],
                       record_dict["soc"],
+                      record_dict["product"],
                       record_dict["power_mode"],
                       record_dict["backend"],
                       record_dict["cpu_thread_num"],
                       record_dict["avg"],
                       record_dict["max"],
-                      record_dict["min"]]
+                      record_dict["min"],
+                      record_dict["repeats"],
+                      record_dict["warmup"]]
             record_str = ",".join(map(str, record))
             if True: print(record_str)
             summary.append(record_str)

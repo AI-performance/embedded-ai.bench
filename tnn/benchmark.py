@@ -51,7 +51,7 @@ def get_some_freq_idx(freq, serial_num):
 
 # benchmark config
 def create_config(framework_name):
-    benchmark_platform = ["android-armv8"]
+    benchmark_platform = ["android-armv7", "android-armv8"]
     config = dict()
     if framework_name == "tnn":
         config['device_work_dir'] ="/data/local/tmp/ai-performance/{}".format(framework_name)
@@ -63,8 +63,8 @@ def create_config(framework_name):
             config[platform]['shared_lib'] = "./tnn/scripts/build{}/libTNN.so".format(32 if "v7" in platform else 64)
             #config[platform]['benchmark_bin'] = "./tnn/scripts/build32/test/benchmark/TNNBench"
             config[platform]['benchmark_bin'] = "./tnn/scripts/build{}/test/TNNTest".format(32 if "v7" in platform else 64)
-        config['repeats'] = 10
-        config['warmup'] = 2
+        config['repeats'] = 100
+        config['warmup'] = 20
         config['support_backend'] = ["ARM", "OPENCL"]
         config["cpu_thread_num"] = [1, 2, 4]
         config["power_mode"] = "big_cores" #"big_cores" # "little_cores", "no_bind"
@@ -100,6 +100,7 @@ def run_cmd(cmd, cmd_type="CMD"):
 
 
 def prepare_models(config):
+    print("=============== {} ===============".format(prepare_models.__name__))
     cmds = list()
     framework_name = config['framework_name']
     clone_models_cmd = "git clone https://gitee.com/yuens/{}-models.git".format(framework_name)
@@ -124,6 +125,7 @@ def prepare_models(config):
 
 
 def prepare_devices(config):
+    print("=============== {} ===============".format(prepare_devices.__name__))
     adb_devices_cmd = "adb devices"
     cmd_handles = run_cmds([adb_devices_cmd])
     serial_num_list = cmd_handles[adb_devices_cmd].readlines()[1:]
@@ -170,6 +172,7 @@ def prepare_devices(config):
 
 
 def prepare_models_for_devices(config):
+    print("=============== {} ===============".format(prepare_models_for_devices.__name__))
     device_work_dir = config['device_work_dir']
     device_dict = config['device_dict']
     model_dict = config['model_dict']
@@ -197,6 +200,7 @@ def prepare_models_for_devices(config):
 
 # assets: benchmark_bin, benchmark_lib
 def prepare_benchmark_assets_for_devices(config):
+    print("=============== {} ===============".format(prepare_benchmark_assets_for_devices.__name__))
     benchmark_platform = config['benchmark_platform']
     device_work_dir = config["device_work_dir"]
     model_dict = config["model_dict"]
@@ -209,7 +213,7 @@ def prepare_benchmark_assets_for_devices(config):
         device_serial = device_serials[didx]
         for pidx in range(len(benchmark_platform)):
             platform = benchmark_platform[pidx]
-            device_work_dir_platform = device_work_dir + "/" + platform #+ "/"
+            device_work_dir_platform = device_work_dir + "/" + platform
             # benchmark assets
             benchmark_bin = config[platform]['benchmark_bin']
             benchmark_lib = config[platform]['shared_lib']
@@ -230,6 +234,7 @@ def prepare_benchmark_assets_for_devices(config):
 
 
 def benchmark(config):
+    print("=============== {} ===============".format(benchmark.__name__))
     device_work_dir = config["device_work_dir"]
     device_dict = config["device_dict"]
     model_dict = config["model_dict"]
@@ -244,21 +249,24 @@ def benchmark(config):
     support_backend = config["support_backend"]
     benchmark_cmd_pattern = config['benchmark_cmd_pattern']
     bench_dict = dict()
-    cmds = list()
+    bench_case_idx = 0
     for didx in range(len(device_serials)):
         device_serial_num = device_serials[didx]
         for pidx in range(len(benchmark_platform)):
             platform = benchmark_platform[pidx]
-            device_work_dir_platform = device_work_dir + "/" + platform #+ "/"
+            device_work_dir_platform = device_work_dir + "/" + platform
             device_benchmark_bin = "/".join([device_work_dir_platform,
                                              os.path.basename(config[platform]['benchmark_bin'])])
             for midx in range(len(model_names)):
                 model_name = model_names[midx]
                 model_dir = "/".join([device_work_dir, os.path.basename(model_dict[model_name])])
+                bench_dict[model_name] = []
                 for bidx in range(len(support_backend)):
                     backend = support_backend[bidx]
                     is_cpu = lambda b: b == "CPU" or b == "ARM"                  
                     for tidx in range(len(config['cpu_thread_num']) if is_cpu(backend) else 1):
+                        bench_case_idx += 1
+                        print("\nbench_case_idx(from 1):{}".format(bench_case_idx))
                         cpu_thread_num = config['cpu_thread_num'][tidx]
                         benchmark_cmd = benchmark_cmd_pattern.format(**{"serial_num": device_serial_num,
                                                                         "device_work_dir": device_work_dir_platform,
@@ -273,7 +281,6 @@ def benchmark(config):
                         cmd_handle = run_cmd(benchmark_cmd)
                         perf_dict = parse_benchmark(cmd_handle)
                         # summarize benchmark info
-                        bench_dict[model_name] = []
                         bench_record = {"soc": device_dict[device_serial_num]['soc'],
                                         "serial_num": device_serial_num,
                                         "platform": platform,
@@ -291,20 +298,21 @@ def benchmark(config):
                                         "cmd": benchmark_cmd}
                         bench_dict[model_name].append(bench_record)
                         print(bench_record)
-                        cmds.append(benchmark_cmd)
     return bench_dict
 
 
-def generate_benchmark_summary(bench_dict):
+def generate_benchmark_summary(bench_dict, is_print_summary=True):
     print("=============== {} ===============".format(generate_benchmark_summary.__name__))
     summary_header = ["model_name", "platform", "soc", "power_mode", "backend", "cpu_thread_num", "avg", "max", "min"]
     summary_header_str = ",".join(summary_header)
     summary = [summary_header_str]
 
     model_names = bench_dict.keys()
+    model_names.sort()
     for midx in range(len(model_names)):
         model_name = model_names[midx]
         bench_records = bench_dict[model_name]
+        print("len(bench_dict[model_name]):{}".format(len(bench_dict[model_name])))
         for ridx in range(len(bench_records)):
             record_dict = bench_records[ridx]
             print(record_dict)
@@ -320,6 +328,10 @@ def generate_benchmark_summary(bench_dict):
             record_str = ",".join(map(str, record))
             if True: print(record_str)
             summary.append(record_str)
+
+    if is_print_summary:
+        summary_str = "\n".join(summary)
+        print("\n" + summary_str)
     return summary
 
 def benchmark_sum(bench_dict):
@@ -362,8 +374,6 @@ def main():
 
     bench_dict = benchmark(config_dict)
     summary_list = generate_benchmark_summary(bench_dict)
-    summary_str = "\n".join(summary_list)
-    print(summary_str)
     return 0
 
 

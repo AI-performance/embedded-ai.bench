@@ -139,7 +139,10 @@ def prepare_devices(config):
         serial_num_line = serial_num_list[sidx]
         serial_num_line = serial_num_line.split("\t")
         device_serial_num = serial_num_line[0]
-        device_status = serial_num_line[1]
+        device_status = serial_num_line[1].strip()
+        if device_status != "device":
+            print("device {} status is {}, skipped".format(device_serial_num, device_status))
+            continue
         device_dict[device_serial_num] = dict()
         device_dict[device_serial_num]['status'] = device_status
         device_dict[device_serial_num]['cpu_max_freqs'] = get_cpu_max_freqs(device_serial_num)

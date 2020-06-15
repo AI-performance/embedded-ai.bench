@@ -317,7 +317,7 @@ def benchmark(config):
 
 def generate_benchmark_summary(bench_dict, is_print_summary=True):
     print("=============== {} ===============".format(generate_benchmark_summary.__name__))
-    summary_header = ["model_name", "platform", "soc", "power_mode", "backend", "cpu_thread_num", "avg", "max", "min", "repeats", "warmup"]
+    summary_header = ["model_name", "platform", "soc", "product", "power_mode", "backend", "cpu_thread_num", "avg", "max", "min", "repeats", "warmup"]
     summary_header_str = ",".join(summary_header)
     summary = [summary_header_str]
 

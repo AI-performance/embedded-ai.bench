@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: tnn-android-armv7-armv8
+name: tnn-android-build
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -33,4 +33,4 @@ jobs:
         echo test, and deploy your project.
         
     - name: Run tnn build
-      run: cd tnn && ./builld.sh
+      run: cd tnn && ./build.sh

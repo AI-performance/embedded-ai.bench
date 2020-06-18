@@ -36,6 +36,8 @@ def get_cpu_max_freqs(serial_num):
         cmd_handles = run_cmds(cmds)
         #print(cmd_handles[cmds[0]].readline().strip())
         cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
+    cpu_max_freqs = cpu_max_freqs[:cpu_num]
+    if DEBUG: print(cpu_max_freqs)
     cpu_max_freqs_ghz = map(lambda freq: float(freq) / 1e6, cpu_max_freqs)
     if DEBUG: print(cpu_max_freqs_ghz)
     return cpu_max_freqs_ghz

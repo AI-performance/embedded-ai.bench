@@ -33,4 +33,4 @@ jobs:
         echo test, and deploy your project.
         
     - name: Run tnn build
-      run: cd build && ./builld.sh
+      run: cd tnn && ./builld.sh

@@ -97,9 +97,12 @@ def run_cmds(cmds, is_adb_cmd=False):
     return cmd_handles
 
 
-def run_cmd(cmd, cmd_type="CMD"):
+def run_cmd(cmd, bench_interval_second=0, cmd_type="CMD"):
     print("{}> {}".format(cmd_type, cmd))
     cmd_handle = os.popen(cmd)
+    if bench_interval_second > 0:
+        print("python> time.sleep({})".format(bench_interval_second))
+        time.sleep(bench_interval_second)
     return cmd_handle
 
 
@@ -298,7 +301,7 @@ def benchmark(config):
                                                                         "warmup": config['warmup'],
                                                                         "thread_num": cpu_thread_num,
                                                                         "bind_cpu_idx": device_dict[device_serial_num]['bind_cpu_idx']})
-                        cmd_handle = run_cmd(benchmark_cmd)
+                        cmd_handle = run_cmd(benchmark_cmd, bench_interval_second=3)
                         perf_dict = parse_benchmark(cmd_handle)
                         # summarize benchmark info
                         bench_record = {"soc": device_dict[device_serial_num]['soc'],

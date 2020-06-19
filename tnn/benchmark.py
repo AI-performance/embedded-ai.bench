@@ -38,7 +38,8 @@ def get_cpu_max_freqs(serial_num):
         cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
     cpu_max_freqs = cpu_max_freqs[:cpu_num]
     if DEBUG: print(cpu_max_freqs)
-    cpu_max_freqs_ghz = map(lambda freq: float(freq) / 1e6, cpu_max_freqs)
+    is_valid_freq = lambda freq_str: True if "No such file or director" not in freq_str else False
+    cpu_max_freqs_ghz = map(lambda freq: float(freq) / 1e6 if is_valid_freq(freq) else None, cpu_max_freqs)
     if DEBUG: print(cpu_max_freqs_ghz)
     return cpu_max_freqs_ghz
 
@@ -149,9 +150,10 @@ def prepare_devices(config):
         device_dict[device_serial_num]['status'] = device_status
         device_dict[device_serial_num]['cpu_max_freqs'] = get_cpu_max_freqs(device_serial_num)
         cpu_max_freqs = get_cpu_max_freqs(device_serial_num)
-        big_cores_idx = get_some_freq_idx(max(get_cpu_max_freqs(device_serial_num)), device_serial_num)
+        cpu_valid_freqs = set(filter(lambda freq: freq != None, cpu_max_freqs))
+        big_cores_idx = get_some_freq_idx(max(cpu_valid_freqs), device_serial_num)
         big_cores_idx_str = ",".join(big_cores_idx)
-        little_cores_idx = get_some_freq_idx(min(get_cpu_max_freqs(device_serial_num)), device_serial_num)
+        little_cores_idx = get_some_freq_idx(min(cpu_valid_freqs), device_serial_num)
         little_cores_idx_str = ",".join(little_cores_idx)
         device_dict[device_serial_num]['big_cores_idx'] = big_cores_idx_str
         device_dict[device_serial_num]['little_cores_idx'] = little_cores_idx_str
@@ -363,6 +365,7 @@ def benchmark_sum(bench_dict):
 def parse_benchmark(cmd_handle):
     output_lines = cmd_handle.readlines()
     if DEBUG: print(output_lines)
+    output_lines = filter(lambda line: "time cost" in line, output_lines)
     assert(len(output_lines) == 1)
     benchmark = dict()
     line = output_lines[0].split()
@@ -375,11 +378,6 @@ def parse_benchmark(cmd_handle):
     assert(len(benchmark) != 0)
     return benchmark
 
- 
-def clean_env_for_devices(config):
-    pass
-    # NOTE(ysh329): give clean work to prepares'
-
 
 def main():
     # TODO(ysh329): add args for backend / threads / powermode / armeabi etc.
@@ -390,7 +388,6 @@ def main():
     config_dict = set_config(config_dict, "model_dict", model_dict)
     config_dict = set_config(config_dict, "device_dict", device_dict)
 
-    clean_env_for_devices(config_dict)
     prepare_models_for_devices(config_dict)
     prepare_benchmark_assets_for_devices(config_dict)
 

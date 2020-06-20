@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
 from datetime import datetime
 import time
@@ -6,6 +7,11 @@ import os
 import re
 
 DEBUG = False
+
+class Engine:
+    def __init__(self, config_dict):
+        pass
+
 
 def pattern_match(text, a, b, contain_a_b=False):
     reg_exp = r'%s(.*?)%s' % (a, b)

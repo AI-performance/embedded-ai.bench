@@ -2,61 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import re
-
 from utils.global_var import logger
 from utils.device import get_cpu_max_freqs, get_some_freq_idx
 from utils.cmd import run_cmds, run_cmd
-
-# benchmark config
-def create_config(framework_name):
-    benchmark_platform = ["android-armv7", "android-armv8"]
-    config = dict()
-    if framework_name == "tnn":
-        config['model_repo'] = "https://gitee.com/yuens/tnn-models.git"
-        # complete model version during `prepare_models`
-        config['model_repo_version'] = -1
-        config['model_repo_version_extra'] = -1
-        config['model_repo_branch'] = -1
-        config['device_work_dir'] = "/data/local/tmp/ai-performance/{}".format(framework_name)
-        config['framework_name'] = framework_name
-        config['benchmark_platform'] = benchmark_platform
-        for pidx in range(len(benchmark_platform)):
-            platform = benchmark_platform[pidx]
-            config[platform] = dict()
-            config[platform]['shared_lib'] = "./tnn/scripts/build{}/libTNN.so".format(32 if "v7" in platform else 64)
-            # config[platform]['benchmark_bin'] = "./tnn/scripts/build32/test/benchmark/TNNBench"
-            config[platform]['benchmark_bin'] = "./tnn/scripts/build{}/test/TNNTest".format(
-                32 if "v7" in platform else 64)
-        config['repeats'] = 100
-        config['warmup'] = 20
-        config['support_backend'] = ["ARM", "OPENCL"]
-        config["cpu_thread_num"] = [1, 2, 4]
-        config["power_mode"] = "big_cores"  # "big_cores" # "little_cores", "no_bind"
-        config[
-            'benchmark_cmd_pattern'] = 'adb -s {serial_num} shell "export LD_LIBRARY_PATH={device_work_dir}; {' \
-                                       'device_benchmark_bin} -mt {model_type} -mp {model_dir} -dt {backend} -ic {' \
-                                       'repeats} -wc {warmup} -th {thread_num} -dl {bind_cpu_idx}" '
-    else:
-        logger.info("Unsupported framework_name: {}".format(framework_name))
-        exit(1)
-    return config
-
-
-####################################################
-# utils
-####################################################
-def pattern_match(text, a, b, contain_a_b=False):
-    reg_exp = r'%s(.*?)%s' % (a, b)
-    if contain_a_b:
-        reg_exp = r'(%s.*%s)' % (a, b)
-    m = re.search(reg_exp, text)
-    if m:
-        return m.group(1)
-    return ""
-
-
-
+from utils.misc import pattern_match
 
 
 ####################################################
@@ -64,6 +13,7 @@ def pattern_match(text, a, b, contain_a_b=False):
 ####################################################
 class Engine:
     def __init__(self, config_dict):
+        os.chdir(config_dict["work_dir"])
         self.config = config_dict
 
 
@@ -108,11 +58,11 @@ class Engine:
 
         model_dict = dict()
         for midx in range(len(models_dir)):
-            logger.debug("{} {}".format(midx, models_dir[midx]))
             model_dir = models_dir[midx]
+            logger.debug("{} {}".format(midx, model_dir))
             file_type = model_dir.split(".")[-1]
             model_name = model_dir.split("/")[-1].replace("." + file_type, "").replace(file_type, "")
-            logger.debug(model_name, file_type)
+            logger.debug("model_name:{}, file_type:{}".format(model_name, file_type))
             if "proto" in model_dir:  # filter proto files
                 model_dict[model_name] = model_dir
         logger.debug(models_dir)
@@ -179,6 +129,7 @@ class Engine:
         assert (len(device_dict) > 0)
         return device_dict
 
+
     def prepare_models_for_devices(self):
         logger.info("=============== {} ===============".format(self.prepare_models_for_devices.__name__))
         device_work_dir = self.config['device_work_dir']
@@ -204,6 +155,7 @@ class Engine:
 
         run_cmds(cmds)
         return 0
+
 
     # assets: benchmark_bin, benchmark_lib
     def prepare_benchmark_assets_for_devices(self):
@@ -240,6 +192,7 @@ class Engine:
 
         run_cmds(cmds)
         return 0
+
 
     def benchmark(self):
         logger.info("=============== {} ===============".format(self.benchmark.__name__))
@@ -373,9 +326,11 @@ class Engine:
         # engine_commit_info
 
 
-def main():
-    # TODO(ysh329): add args for backend / threads / powermode / armeabi etc.
+def test_engine():
+    from utils.global_var import create_config
+
     config_dict = create_config("tnn")
+    config_dict['work_dir'] = './../tnn'
     tnn = Engine(config_dict)
     model_dict = tnn.prepare_models()
     device_dict = tnn.prepare_devices()
@@ -391,4 +346,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test_engine()

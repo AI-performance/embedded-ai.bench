@@ -11,6 +11,7 @@ def create_config(framework_name):
     benchmark_platform = ["android-armv7", "android-armv8"]
     config = dict()
     if framework_name == "tnn":
+        config['work_dir'] = "./tnn"
         config['model_repo'] = "https://gitee.com/yuens/tnn-models.git"
         # complete model version during `prepare_models`
         config['model_repo_version'] = -1

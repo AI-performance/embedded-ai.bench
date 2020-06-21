@@ -4,6 +4,7 @@
 from utils.global_var import logger
 from utils.cmd import run_cmd, run_cmds
 
+
 def get_adb_devices(is_print_status=False):
     device_dict = dict()
     adb_device_cmd = "adb devices"
@@ -13,7 +14,7 @@ def get_adb_devices(is_print_status=False):
     logger.info(devices)
     for didx in range(len(devices)):
         dev = devices[didx]
-        if len(dev) == 2: # sublist: (serial_num, status)
+        if len(dev) == 2:  # sublist: (serial_num, status)
             serial_num = dev[0]
             status = dev[1].strip()
             device_dict[serial_num] = status
@@ -32,7 +33,7 @@ def get_cpu_max_freqs(serial_num):
 
     try:
         cmd_handles = run_cmds(cmds)
-        #logger.info(cmd_handles[cmds[0]].readline())
+        # logger.info(cmd_handles[cmds[0]].readline())
         cpu_max_freqs = map(lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds)
     except IndexError:
         logger.warn("cat: /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: Permission denied")
@@ -69,7 +70,7 @@ def test_main():
     for sidx in range(len(serials)):
         ser = serials[sidx]
         status = device_dict[ser]
-        cpus_max_freq = get_cpu_max_freqs(ser) # for each cpu's max freq
+        cpus_max_freq = get_cpu_max_freqs(ser)  # for each cpu's max freq
         max_freq = max(cpus_max_freq)
         min_freq = min(cpus_max_freq)
         max_freq_cluster_idx = get_some_freq_idx(max_freq, ser, cpus_max_freq)

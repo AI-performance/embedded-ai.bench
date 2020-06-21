@@ -1,0 +1,12 @@
+# note(ysh329): ref liaochangjiang from https://juejin.im/post/5cdb8adc518825697d771349
+
+repos:
+- repo: https://github.com/ambv/black
+  rev: stable
+  hooks:
+    - id: black
+      language_version: python3.7
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v1.2.3
+  hooks:
+    - id: flake8

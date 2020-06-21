@@ -1,14 +1,14 @@
 # TNN
 
-目前只支持Ubuntu环境
+Only support build android.
 
 ## build.sh
 
 Build Android armv7 && armv8.
 
-## benchmark.py
+## benchmark
 
-Run benchmark.py `python benchmark.py`
+ignored.
 
 ## Appendix
 

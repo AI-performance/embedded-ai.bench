@@ -1,12 +1,16 @@
 # note(ysh329): ref liaochangjiang from https://juejin.im/post/5cdb8adc518825697d771349
-
 repos:
-- repo: https://github.com/ambv/black
+#- repo: https://gitee.com/yuens/pre-commit-hooks.git
+#  sha: v1.0.1
+#  hooks:
+#    - id: remove-crlf
+#        files: (?!.*third_party)^.*$|(?!.*book)^.*$
+- repo: https://gitee.com/ai-performance/black
   rev: stable
   hooks:
     - id: black
       language_version: python3.7
-- repo: https://github.com/pre-commit/pre-commit-hooks
+- repo: https://gitee.com/ai-performance/pre-commit-hooks.git
   rev: v1.2.3
   hooks:
     - id: flake8

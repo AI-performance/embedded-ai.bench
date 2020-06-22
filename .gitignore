@@ -1,5 +1,12 @@
 # Default ignored files
 
+# temp
+tmp/
+
+# tnn
+tnn/tnn-models/
+tnn/tnn/
+
 # Prerequisites
 *.d
 

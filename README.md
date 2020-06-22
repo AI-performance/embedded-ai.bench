@@ -15,3 +15,16 @@ pip install pre-commit
 # 如需卸载则执行
 pre-commit uninstall
 ```
+
+## 项目架构
+
+下图描述了本项目的架构:
+
+![embedded-ai.bench architecture](./docs/bench-architecture.png "embedded-ai.bench architecture")
+
+1. class Engine: 由`engine_config`创建每个框架的实例、加载模型models、编译引擎lib(TODO:待集成到py脚本)，跑出bench结果；
+2. BenchSum(TODO): 汇总各Engine实例的Bench结果；
+3. common model repo(TODO): 存放公共原始模型的仓库。如Caffe、TensorFlow框架的经典模型(MobileNetV1/V2等)。
+    1. 各引擎独立模型仓库，如tnn-models。包含从公共公共模型仓库转换得到的tnn的模型、模型转换器的一键编译脚本(TODO)、模型转换的一键转换脚本(TODO)、模型版本一键刷新到README的脚本；
+    2. 各引擎独立模型仓库独立定期更新(TODO)；
+    3. 每个Engine实例在执行过程中会拉取各自独立模型仓库的模型，为bench做准备。

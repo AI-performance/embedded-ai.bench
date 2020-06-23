@@ -2,6 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 import logging
+import sys
+
+sys.path.append("..")
 
 
 class LoggerCreator:
@@ -10,10 +13,15 @@ class LoggerCreator:
         self.create_logger()
 
     def create_logger(self):
-        logging.basicConfig(format='[%(levelname)-5s %(asctime)s,%(msecs)d %(filename)s:%(lineno)d %(funcName)s] %('
-                                   'message)s',
-                            datefmt='%d-%m-%Y:%H:%M:%S')
-        logging.getLogger().setLevel(logging.DEBUG if self.enable_debug else logging.INFO)
+        logging.basicConfig(
+            format="[%(levelname)-5s [%(asctime)s,%(msecs)d"
+            " %(filename)s:%(lineno)d %(funcName)s] %("
+            "message)s",
+            datefmt="%d-%m-%Y:%H:%M:%S",
+        )
+        logging.getLogger().setLevel(
+            logging.DEBUG if self.enable_debug else logging.INFO
+        )
         logger = logging.getLogger()
         return logger
 
@@ -31,7 +39,9 @@ def test_logger_creator(use_global_var=True, enable_debug=False):
         logger_creator = LoggerCreator(enable_debug)
         logger = logger_creator.create_logger()
 
-    logger.info("get_enable_debug:{}".format(logger_creator.get_enable_debug()))
+    logger.info(
+        "get_enable_debug:{}".format(logger_creator.get_enable_debug())  # noaq
+    )  # noqa
     logger.debug("This is a debug log")
     logger.info("This is an info log")
     logger.critical("This is critical")

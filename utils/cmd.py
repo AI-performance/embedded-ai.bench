@@ -3,7 +3,10 @@
 
 import os
 import time
-from utils.global_var import logger
+import sys
+
+sys.path.append("..")
+from utils.global_var import logger  # noqa
 
 
 def run_cmds(cmds, is_adb_cmd=False):
@@ -35,16 +38,17 @@ def test_run_cmds():
     for cidx in range(len(cmds)):
         cmd = cmds[cidx]
         h = cmd_handls[cmd]
-        logger.info('cmd_idx:{}, cmd:{}'.format(cidx, cmd))
+        logger.info("cmd_idx:{}, cmd:{}".format(cidx, cmd))
         logger.info(h.readlines())
 
 
 def test_run_cmd():
+
     cmds = ["ls", "pwd", "adb devices"]
     for cidx in range(len(cmds)):
         cmd = cmds[cidx]
         h = run_cmd(cmd)
-        logger.info('cmd_idx:{}, cmd:{}'.format(cidx, cmd))
+        logger.info("cmd_idx:{}, cmd:{}".format(cidx, cmd))
         logger.info(h.readlines())
 
 

@@ -2,10 +2,13 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from utils.global_var import logger
-from utils.device import get_cpu_max_freqs, get_some_freq_idx
-from utils.cmd import run_cmds, run_cmd
-from utils.misc import pattern_match
+import sys
+
+sys.path.append("..")
+from utils.global_var import logger  # noqa
+from utils.device import get_cpu_max_freqs, get_some_freq_idx  # noqa
+from utils.cmd import run_cmds, run_cmd  # noqa
+from utils.misc import pattern_match  # noqa
 
 
 class Engine:
@@ -464,11 +467,21 @@ class Engine:
 
 
 def test_engine():
+    import sys
+
+    sys.path.append("..")
     from utils.global_var import create_config
 
-    config_dict = create_config("tnn")
-    config_dict["work_dir"] = "./../tnn"
+    framework_name = "tnn"
+    config_dict = create_config(framework_name)
+    config_dict["work_dir"] = os.getcwd() + "/../tnn"
+
     tnn = Engine(config_dict)
+    tnn.set_config("benchmark_platform", ["android-armv8"])
+    tnn.set_config("support_backend", ["ARM"])
+    tnn.set_config("cpu_thread_num", [2])
+    tnn.config["repeats"] = 5
+    tnn.config["warmup"] = 2
     model_dict = tnn.prepare_models()
     device_dict = tnn.prepare_devices()
     config_dict = tnn.set_config("model_dict", model_dict)

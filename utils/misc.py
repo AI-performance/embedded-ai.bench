@@ -2,12 +2,15 @@
 # -*- coding: UTF-8 -*-
 
 import re
+import sys
+
+sys.path.append("..")
 
 
 def pattern_match(text, a, b, contain_a_b=False):
-    reg_exp = r'%s(.*?)%s' % (a, b)
+    reg_exp = r"%s(.*?)%s" % (a, b)
     if contain_a_b:
-        reg_exp = r'(%s.*%s)' % (a, b)
+        reg_exp = r"(%s.*%s)" % (a, b)
     m = re.search(reg_exp, text)
     if m:
         return m.group(1)
@@ -24,7 +27,11 @@ def test_pattern_match():
 
     for contain_a_b in contain_a_b_list:
         res = pattern_match(text, ptn_a, ptn_b, contain_a_b)
-        logger.info("text:{}, ptn_a:{}, ptn_b:{}, contain_a_b:{}".format(text, ptn_a, ptn_b, contain_a_b))
+        logger.info(
+            "text:{}, ptn_a:{}, ptn_b:{}, contain_a_b:{}".format(
+                text, ptn_a, ptn_b, contain_a_b
+            )
+        )
         logger.info("{} res:{}".format(pattern_match.__name__, res))
 
 

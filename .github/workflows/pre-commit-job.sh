@@ -10,7 +10,7 @@ set -e
 cd `dirname $0`
 cd ..
 export PATH=/usr/bin:$PATH
-apt-get install python3-pip python3-setuptools python3-dev python3-wheel
+pip install wheel
 pip install pre-commit
 pre-commit install
 

@@ -185,7 +185,7 @@ class Engine:
             logger.debug(product)
 
         logger.debug(device_dict)
-        assert len(device_dict) > 0
+        logger.info("len(device_dict):{}".format(len(device_dict)))
         return device_dict
 
     def prepare_models_for_devices(self):
@@ -484,6 +484,9 @@ def test_engine():
     tnn.config["warmup"] = 2
     model_dict = tnn.prepare_models()
     device_dict = tnn.prepare_devices()
+    if len(device_dict) == 0:
+        logger.info("no device found")
+        return 0
     config_dict = tnn.set_config("model_dict", model_dict)
     config_dict = tnn.set_config("device_dict", device_dict)
 

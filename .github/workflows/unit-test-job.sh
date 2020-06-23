@@ -11,10 +11,8 @@ for py_dir in ${PYDIR_LIST[@]}; do
             # do nothing
             date
         else
-            echo "###########################################"
-            echo "# Python Test for embededed-ai.bench"
-            echo "# py file: ${file}"
-            echo "###########################################"
+            echo "#>>>>>> Python Test for embededed-ai.bench"
+            echo "#>>>>>> py file: ${file}"
             cd ${py_dir}
             echo $(basename ${file})
             python $(basename ${file})

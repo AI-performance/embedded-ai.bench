@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 function abort() {
     echo "Your change doesn't follow embedded-ai.bench's code style" 1>&2
     echo "Please use pre-commit to auto-format your code." 1>&2
@@ -10,6 +10,7 @@ set -e
 cd `dirname $0`
 cd ..
 export PATH=/usr/bin:$PATH
+apt-get install python3-pip python3-setuptools python3-dev python3-wheel
 pip install pre-commit
 pre-commit install
 

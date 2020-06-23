@@ -10,6 +10,7 @@ set -e
 cd `dirname $0`
 cd ..
 export PATH=/usr/bin:$PATH
+pip install pre-commit
 pre-commit install
 
 # note(ysh329): enable below for C/C++

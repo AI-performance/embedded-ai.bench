@@ -16,13 +16,8 @@ function install_miniconda() {
     chmod +x Miniconda3-latest-Linux-x86_64.sh
     ./Miniconda3-latest-Linux-x86_64.sh -b
 
-    user_name=$(whoammi)
-    if [[ $user_name =~ "root" ]]
-    then
-	PREFIX="/root/miniconda3"
-    else
-	PREFIX="/home/${user_name}/miniconda3"
-    fi
+    cur_dir=$(pwd)
+    PREFIX="$cur_dir/miniconda3"
 
     echo """
 # >>> conda initialize >>>

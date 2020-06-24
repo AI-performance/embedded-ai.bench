@@ -6,7 +6,7 @@ repos:
 #    - id: remove-crlf
 #        files: (?!.*third_party)^.*$|(?!.*book)^.*$
 - repo: https://gitee.com/ai-performance/black
-  rev: stable
+  rev: 6bedb5c #stable
   hooks:
     - id: black
       language_version: python3.7

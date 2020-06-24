@@ -14,10 +14,9 @@ function install_miniconda() {
     #apt install -y wget git
     wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     chmod +x Miniconda3-latest-Linux-x86_64.sh
-    ./Miniconda3-latest-Linux-x86_64.sh -b
+    PREFIX="$(pwd)/miniconda3"
+    ./Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX
 
-    cur_dir=$(pwd)
-    PREFIX="$cur_dir/miniconda3"
 
     echo """
 # >>> conda initialize >>>

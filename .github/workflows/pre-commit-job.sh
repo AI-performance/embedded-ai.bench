@@ -10,8 +10,8 @@ function abort() {
 function install_miniconda() {
     #hash conda 2>/dev/null || { echo >&2 "I require foo but it's not installed.  Aborting."; return; }
 
-    apt update
-    apt install -y wget git
+    #apt update
+    #apt install -y wget git
     wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     chmod +x Miniconda3-latest-Linux-x86_64.sh
     ./Miniconda3-latest-Linux-x86_64.sh -b

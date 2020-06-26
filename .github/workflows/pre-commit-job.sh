@@ -86,6 +86,7 @@ unset __conda_setup
 }
 
 function pre_commit_check() {
+    python3 -m pip install pre-commit
     pre-commit uninstall
     pre-commit install
     if ! pre-commit run -a ; then

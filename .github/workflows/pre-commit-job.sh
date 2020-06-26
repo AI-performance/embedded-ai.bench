@@ -35,12 +35,12 @@ function abort() {
 function install_miniconda() {
     #apt update
     apt install -y wget git
-    cmd="conda"
-    is_conda_existed=`is_cmd_existed ${cmd}`
-    echo $is_conda_existed
-    if [[ $is_conda_existed =~ "1" ]]; then
-        return
-    fi
+    #cmd="conda"
+    #is_conda_existed=`is_cmd_existed ${cmd}`
+    #echo $is_conda_existed
+    #if [[ $is_conda_existed =~ "1" ]]; then
+    #    return
+    #fi
 
     miniconda_pkg_name=""
     platform=$(get_platform)
@@ -82,16 +82,6 @@ unset __conda_setup
     python3 -m pip install pre-commit
     conda activate
     conda init bash
-}
-
-function pre_commit_check() {
-    source ~/.bashrc
-    conda init
-    conda create --yes --quiet --name dev-env-py python=3.8
-    conda activate
-    conda activate dev-env-py
-
-    python3 -m pip install pre-commit
 
     pre-commit uninstall
     pre-commit install
@@ -112,4 +102,3 @@ cd ..
 export PATH=/usr/bin:$PATH
 
 install_miniconda
-pre_commit_check

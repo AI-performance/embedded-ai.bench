@@ -4,11 +4,15 @@ Only support build android.
 
 ## build.sh
 
-Build Android armv7 && armv8.
+Build Android armv7 && armv8:
+
+```shell
+./build.sh
+```
 
 ## benchmark
 
-ignored.
+See `<embedded-ai.bench>/bench.py` and run it.
 
 ## Appendix
 

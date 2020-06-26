@@ -86,7 +86,9 @@ unset __conda_setup
 
 function pre_commit_check() {
     source ~/.bashrc
+    conda init
     conda create --yes --quiet --name dev-env-py python=3.8
+    conda activate
     conda activate dev-env-py
 
     python3 -m pip install pre-commit

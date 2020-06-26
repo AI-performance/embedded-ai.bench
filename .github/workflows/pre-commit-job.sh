@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -ex
 
-readonly PREFIX="$(pwd)/miniconda3"
 function is_cmd_existed() {
   cmd=$1
   exec_res=$(command -v ${cmd})
@@ -55,6 +54,7 @@ function install_miniconda() {
 
     wget -c "https://repo.anaconda.com/miniconda/${miniconda_pkg_name}"
     chmod +x ${miniconda_pkg_name}
+    PREFIX="$(pwd)/miniconda3"
     ./${miniconda_pkg_name} -b -p $PREFIX
 
     echo """

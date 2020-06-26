@@ -460,11 +460,44 @@ class Engine:
         assert len(benchmark) != 0
         return benchmark
 
-    # TODO
-    def write_list_to_file(self):
-        time_stamp_human = 1  # noqa
-        # engine_commit_info
-        pass
+    # TODO(ysh329): write summary with model verison, framework version
+    def write_list_to_file(
+        self, bench_list, out_file_dir=None, suffix=".bench"
+    ):  # noqa
+        framework_name = self.config["framework_name"]
+        if out_file_dir is None:
+            import time
+
+            time_stamp_human = time.strftime(
+                "%Y%m%d-%H%M%S", time.localtime()  # noqa
+            )  # noqa
+            benchmark_platform = "".join(self.config["benchmark_platform"])
+            framework_version = str(1)
+            model_version = str(1)  # noqa
+            work_dir = self.config["work_dir"]  # noqa
+            out_file_dir = "-".join(
+                [
+                    framework_name,
+                    framework_version,
+                    benchmark_platform,
+                    time_stamp_human,
+                ]
+            )
+            out_file_dir += suffix
+            logger.info(
+                "bench for {} 's out_file_dir:{}".format(  # noqa
+                    framework_name, out_file_dir
+                )  # noqa
+            )
+
+        bench_str = "\n".join(bench_list)
+        with open(out_file_dir, "w") as f:
+            f.writelines(bench_str)
+            logger.info(
+                "write {} benchmark result to {}".format(  # noqa
+                    framework_name, out_file_dir
+                )  # noqa
+            )
 
 
 class TestEngine(unittest.TestCase):

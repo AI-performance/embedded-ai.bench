@@ -40,7 +40,6 @@ function install_miniconda() {
     if [[ $is_conda_existed =~ "1" ]]; then
         return
     fi
-    exit
 
     miniconda_pkg_name=""
     platform=$(get_platform)
@@ -57,7 +56,6 @@ function install_miniconda() {
     chmod +x ${miniconda_pkg_name}
     PREFIX="$(pwd)/miniconda3"
     ./${miniconda_pkg_name} -b -p $PREFIX
-
 
     echo """
 # >>> conda initialize >>>
@@ -86,9 +84,13 @@ unset __conda_setup
 }
 
 function pre_commit_check() {
+    source ~/.bashrc
+    conda activate dev-env-py
     python3 -m pip install pre-commit
+
     pre-commit uninstall
     pre-commit install
+
     if ! pre-commit run -a ; then
         ls -lh
         git diff --exit-code

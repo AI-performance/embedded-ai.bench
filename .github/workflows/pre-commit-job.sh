@@ -33,7 +33,7 @@ function abort() {
 
 function install_miniconda() {
     #apt update
-    apt install -y wget git
+    #apt install -y wget git
     #cmd="conda"
     #is_conda_existed=`is_cmd_existed ${cmd}`
     #echo $is_conda_existed

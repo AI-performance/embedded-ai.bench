@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+set -ex
 
 readonly PREFIX="$(pwd)/miniconda3"
 function is_cmd_existed() {
@@ -80,11 +80,8 @@ unset __conda_setup
     conda activate dev-env-py
 
     python3 -m pip install pre-commit
-    conda activate
-    conda init bash
-
-    pre-commit uninstall
     pre-commit install
+    conda init bash
 
     if ! pre-commit run -a ; then
         ls -lh
@@ -95,7 +92,6 @@ unset __conda_setup
     trap : 0
 }
 
-set e
 trap 'abort' 0
 cd `dirname $0`
 cd ..

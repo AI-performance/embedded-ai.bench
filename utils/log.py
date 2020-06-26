@@ -3,6 +3,7 @@
 
 import logging
 import sys
+import unittest
 
 sys.path.append("..")
 
@@ -14,10 +15,10 @@ class LoggerCreator:
 
     def create_logger(self):
         logging.basicConfig(
-            format="[%(levelname)-5s [%(asctime)s,%(msecs)d"
+            format="[%(levelname)s] [%(asctime)s,%(msecs)d"
             " %(filename)s:%(lineno)d %(funcName)s] %("
             "message)s",
-            datefmt="%d-%m-%Y:%H:%M:%S",
+            datefmt="%Y-%m-%d:%H:%M:%S",
         )
         logging.getLogger().setLevel(
             logging.DEBUG if self.enable_debug else logging.INFO
@@ -33,8 +34,8 @@ def test_logger_creator(use_global_var=True, enable_debug=False):
     print("use_global_var:{}".format(use_global_var))
     if use_global_var:
         # `enable_debug` defined in utils.global_var
-        from utils.global_var import logger
-        from utils.global_var import logger_creator
+        from core.global_config import logger
+        from core.global_config import logger_creator
     else:
         logger_creator = LoggerCreator(enable_debug)
         logger = logger_creator.create_logger()
@@ -48,14 +49,29 @@ def test_logger_creator(use_global_var=True, enable_debug=False):
     logger.error("An error occurred\n")
 
 
-def test_main():
-    use_global_var = [True, False]
-    enable_debug = [True, False]
+class TestLog(unittest.TestCase):
+    def setUp(self):
+        print(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )
+        )  # noqa
 
-    for g in use_global_var:
-        for d in enable_debug:
-            test_logger_creator(g, d)
+    def tearDown(self):
+        print(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )
+        )  # noqa
+
+    def test_log(self):
+        use_global_var = [True, False]
+        enable_debug = [True, False]
+
+        for g in use_global_var:
+            for d in enable_debug:
+                test_logger_creator(g, d)
 
 
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

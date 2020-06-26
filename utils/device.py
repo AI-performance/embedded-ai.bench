@@ -2,9 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 import sys
+import unittest
 
 sys.path.append("..")
-from utils.global_var import logger  # noqa
+from core.global_config import logger  # noqa
 from utils.cmd import run_cmd, run_cmds  # noqa
 
 
@@ -13,7 +14,7 @@ def get_adb_devices(is_print_status=False):
     adb_device_cmd = "adb devices"
     h = run_cmd(adb_device_cmd)
     devices = h.readlines()[1:]
-    devices = list(map(lambda dev: dev.split("\t"), devices))
+    devices = list(map(lambda devi: devi.split("\t"), devices))
     logger.info(devices)
     for didx in range(len(devices)):
         dev = devices[didx]
@@ -96,26 +97,46 @@ def get_some_freq_idx(freq, serial_num, cpu_max_freqs=None):
     return some_freq_idx_list
 
 
-def test_main():
-    device_dict = get_adb_devices(True)
-    serials = device_dict.keys()
-    serials = list(serials)
-    for sidx in range(len(serials)):
-        ser = serials[sidx]
-        status = device_dict[ser]
-        cpus_max_freq = get_cpu_max_freqs(ser)  # for each cpu's max freq
-        max_freq = max(cpus_max_freq)
-        min_freq = min(cpus_max_freq)
-        max_freq_cluster_idx = get_some_freq_idx(max_freq, ser, cpus_max_freq)
-        min_freq_cluster_idx = get_some_freq_idx(min_freq, ser, cpus_max_freq)
+class TestDevice(unittest.TestCase):
+    def setUp(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
 
-        logger.info("sidx:{}, ser:{}, status:{}".format(sidx, ser, status))
-        logger.info("cpus_max_freq:{}".format(cpus_max_freq))
-        logger.info("max_freq:{}".format(max_freq))
-        logger.info("max_freq_cluster_idx:{}".format(max_freq_cluster_idx))
-        logger.info("min_freq:{}".format(min_freq))
-        logger.info("min_freq_cluster_idx:{}".format(min_freq_cluster_idx))
+    def tearDown(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
+
+    def test_main(self):
+        device_dict = get_adb_devices(True)
+        serials = device_dict.keys()
+        serials = list(serials)
+        for sidx in range(len(serials)):
+            ser = serials[sidx]
+            status = device_dict[ser]
+            # for each cpu's max freq
+            cpus_max_freq = get_cpu_max_freqs(ser)
+            max_freq = max(cpus_max_freq)
+            min_freq = min(cpus_max_freq)
+            max_freq_cluster_idx = get_some_freq_idx(
+                max_freq, ser, cpus_max_freq
+            )  # noqa
+            min_freq_cluster_idx = get_some_freq_idx(
+                min_freq, ser, cpus_max_freq
+            )  # noqa
+
+            logger.info("sidx:{}, ser:{}, status:{}".format(sidx, ser, status))
+            logger.info("cpus_max_freq:{}".format(cpus_max_freq))
+            logger.info("max_freq:{}".format(max_freq))
+            logger.info("max_freq_cluster_idx:{}".format(max_freq_cluster_idx))
+            logger.info("min_freq:{}".format(min_freq))
+            logger.info("min_freq_cluster_idx:{}".format(min_freq_cluster_idx))
 
 
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

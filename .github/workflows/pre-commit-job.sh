@@ -1,5 +1,29 @@
 #!/usr/bin/env bash
-set -ex
+set -x
+
+function is_cmd_existed() {
+  cmd=$1
+  exec_res=$(command -v ${cmd})
+  if [[ ${#exec_res} > 0 ]]; then
+      echo "command ${cmd} existed"
+      echo 1
+  else
+      echo "command ${cmd} not existed"
+      echo 0
+  fi
+}
+
+function get_platform() {
+    uname_a_str=`uname -a`
+    if [[ $uname_a_str =~ "Linux" ]]; then
+        echo "Linux"
+    elif [[ $uname_a_str =~ "Darwin" ]]; then
+        echo "Darwin"
+    else
+        echo "Unsupported for platform ${uname_a_str}"
+        exit 1
+    fi
+}
 
 function abort() {
     echo "Your change doesn't follow embedded-ai.bench's code style" 1>&2
@@ -8,14 +32,31 @@ function abort() {
 }
 
 function install_miniconda() {
-    #hash conda 2>/dev/null || { echo >&2 "I require foo but it's not installed.  Aborting."; return; }
-
     #apt update
     #apt install -y wget git
-    wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    chmod +x Miniconda3-latest-Linux-x86_64.sh
+    cmd="conda"
+    is_conda_existed=`is_cmd_existed ${cmd}`
+    echo $is_conda_existed
+    if [[ $is_conda_existed =~ "1" ]]; then
+        return
+    fi
+    exit
+
+    miniconda_pkg_name=""
+    platform=$(get_platform)
+    if [[ $platform =~ "Linux" ]]; then
+        miniconda_pkg_name="Miniconda3-latest-Linux-x86_64.sh"
+    elif [[ $platform =~ "Darwin" ]]; then
+        miniconda_pkg_name="Miniconda3-latest-MacOSX-x86_64.sh"
+    else
+        echo "Unsupported for platform ${platform}"
+        exit 1
+    fi
+
+    wget -c "https://repo.anaconda.com/miniconda/${miniconda_pkg_name}"
+    chmod +x ${miniconda_pkg_name}
     PREFIX="$(pwd)/miniconda3"
-    ./Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX
+    ./${miniconda_pkg_name} -b -p $PREFIX
 
 
     echo """
@@ -41,14 +82,12 @@ unset __conda_setup
     conda activate dev-env-py
 
     python3 -m pip install pre-commit
-    #alias pre-commit=/root/miniconda3/envs/dev-env-py/bin/pre-commit
-    pre-commit install
     conda init bash
+}
 
-# note(ysh329): enable below for C/C++
-# which clang-format
-# clang-format --version
-
+function pre_commit_check() {
+    pre-commit uninstall
+    pre-commit install
     if ! pre-commit run -a ; then
         ls -lh
         git diff --exit-code
@@ -58,9 +97,11 @@ unset __conda_setup
     trap : 0
 }
 
+set e
 trap 'abort' 0
 cd `dirname $0`
 cd ..
 export PATH=/usr/bin:$PATH
 
 install_miniconda
+pre_commit_check

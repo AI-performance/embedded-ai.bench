@@ -4,9 +4,10 @@
 import os
 import time
 import sys
+import unittest
 
 sys.path.append("..")
-from utils.global_var import logger  # noqa
+from core.global_config import logger  # noqa
 
 
 def run_cmds(cmds, is_adb_cmd=False):
@@ -31,31 +32,39 @@ def run_cmd(cmd, bench_interval_second=0, cmd_type="CMD"):
     return cmd_handle
 
 
-def test_run_cmds():
-    # run_cmds
-    cmds = ["ls", "ls -l", "adb devices"]
-    cmd_handls = run_cmds(cmds)
-    for cidx in range(len(cmds)):
-        cmd = cmds[cidx]
-        h = cmd_handls[cmd]
-        logger.info("cmd_idx:{}, cmd:{}".format(cidx, cmd))
-        logger.info(h.readlines())
+class TestCmd(unittest.TestCase):
+    def setUp(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
 
+    def tearDown(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
 
-def test_run_cmd():
+    def test_run_cmds(self):
+        # run_cmds
+        cmds = ["ls", "ls -l", "adb devices"]
+        cmd_handls = run_cmds(cmds)
+        for cidx in range(len(cmds)):
+            cmd = cmds[cidx]
+            h = cmd_handls[cmd]
+            logger.info("cmd_idx:{}, cmd:{}".format(cidx, cmd))
+            logger.info(h.readlines())
 
-    cmds = ["ls", "pwd", "adb devices"]
-    for cidx in range(len(cmds)):
-        cmd = cmds[cidx]
-        h = run_cmd(cmd)
-        logger.info("cmd_idx:{}, cmd:{}".format(cidx, cmd))
-        logger.info(h.readlines())
-
-
-def test_main():
-    test_run_cmds()
-    test_run_cmd()
+    def test_run_cmd(self):
+        cmds = ["ls", "pwd", "adb devices"]
+        for cidx in range(len(cmds)):
+            cmd = cmds[cidx]
+            h = run_cmd(cmd)
+            logger.info("cmd_idx:{}, cmd:{}".format(cidx, cmd))
+            logger.info(h.readlines())
 
 
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

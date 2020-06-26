@@ -20,6 +20,22 @@ pip install pre-commit
 pre-commit uninstall
 ```
 
+如若找不到python3.8，可以安装minconda3，使用如下命令：
+
+```shell
+# 自动安装miniconda3，并写入当前用户的环境变量
+.github/workflows/pre-commit-job.sh
+
+# 提交代码前先创建一个名为dev_env_py的环境为例，遇到选择y
+conda create -n dev_env_py python=3.8
+
+# 激活刚创建的环境
+conda activate dev_env_py
+
+# 重新安装pre-commit
+pre-commit install
+```
+
 ## 项目架构
 
 下图描述了本项目的架构:

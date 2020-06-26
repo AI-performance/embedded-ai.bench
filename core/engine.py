@@ -3,9 +3,10 @@
 
 import os
 import sys
+import unittest
 
 sys.path.append("..")
-from utils.global_var import logger  # noqa
+from core.global_config import logger  # noqa
 from utils.device import get_cpu_max_freqs, get_some_freq_idx  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
 from utils.misc import pattern_match  # noqa
@@ -466,39 +467,51 @@ class Engine:
         pass
 
 
-def test_engine():
-    import sys
+class TestEngine(unittest.TestCase):
+    def setUp(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
 
-    sys.path.append("..")
-    from utils.global_var import create_config
+    def tearDown(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
 
-    framework_name = "tnn"
-    config_dict = create_config(framework_name)
-    config_dict["work_dir"] = os.getcwd() + "/../tnn"
+    def test_tnn_engine(self):
+        from core.global_config import create_config
 
-    tnn = Engine(config_dict)
-    tnn.set_config("benchmark_platform", ["android-armv8"])
-    tnn.set_config("support_backend", ["ARM"])
-    tnn.set_config("cpu_thread_num", [2])
-    tnn.config["repeats"] = 5
-    tnn.config["warmup"] = 2
-    model_dict = tnn.prepare_models()
-    device_dict = tnn.prepare_devices()
-    if len(device_dict) == 0:
-        logger.info("no device found")
+        framework_name = "tnn"
+        config_dict = create_config(framework_name)
+        config_dict["work_dir"] = os.getcwd() + "/../tnn"
+
+        tnn = Engine(config_dict)
+        tnn.set_config("benchmark_platform", ["android-armv8"])
+        tnn.set_config("support_backend", ["ARM"])
+        tnn.set_config("cpu_thread_num", [2])
+        tnn.config["repeats"] = 5
+        tnn.config["warmup"] = 2
+        model_dict = tnn.prepare_models()
+        device_dict = tnn.prepare_devices()
+        if len(device_dict) == 0:
+            logger.info("no device found")
+            return 0
+        config_dict = tnn.set_config("model_dict", model_dict)
+        config_dict = tnn.set_config("device_dict", device_dict)
+
+        tnn.prepare_models_for_devices()
+        tnn.prepare_benchmark_assets_for_devices()
+
+        bench_dict = tnn.benchmark()
+        summary_list = tnn.generate_benchmark_summary(bench_dict)
+        summary_str = "\n".join(summary_list)
+        logger.info("summary_str:\n{}".format(summary_str))
         return 0
-    config_dict = tnn.set_config("model_dict", model_dict)
-    config_dict = tnn.set_config("device_dict", device_dict)
-
-    tnn.prepare_models_for_devices()
-    tnn.prepare_benchmark_assets_for_devices()
-
-    bench_dict = tnn.benchmark()
-    summary_list = tnn.generate_benchmark_summary(bench_dict)
-    summary_str = "\n".join(summary_list)
-    logger.info("summary_str:\n{}".format(summary_str))
-    return 0
 
 
 if __name__ == "__main__":
-    test_engine()
+    unittest.main()

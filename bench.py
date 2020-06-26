@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from core.engine import Engine
-from utils.global_var import create_config
+from core.global_config import create_config
 
 
 def main():

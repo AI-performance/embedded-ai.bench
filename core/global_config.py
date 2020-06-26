@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-
 import sys
+import unittest
 
 sys.path.append("..")
 from utils.log import LoggerCreator  # noqa
@@ -15,7 +15,7 @@ def create_config(framework_name):
     benchmark_platform = ["android-armv7", "android-armv8"]
     config = dict()
     if framework_name == "tnn":
-        config["work_dir"] = "./tnn"
+        config["work_dir"] = "./{}".format(framework_name)
         config["model_repo"] = "https://gitee.com/yuens/tnn-models.git"
         # complete model version during `prepare_models`
         config["model_repo_version"] = -1
@@ -54,3 +54,28 @@ def create_config(framework_name):
         logger.info("Unsupported framework_name: {}".format(framework_name))
         exit(1)
     return config
+
+
+class TestGlobalConfig(unittest.TestCase):
+    def setUp(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
+
+    def tearDown(self):
+        logger.info(
+            "{} {}".format(
+                self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
+            )  # noqa
+        )
+
+    def test_config(self):
+        tnn_config = create_config("tnn")
+        logger.info("tnn_config:\n{}".format(tnn_config))
+        self.assertNotEqual(tnn_config, dict())
+
+
+if __name__ == "__main__":
+    unittest.main()

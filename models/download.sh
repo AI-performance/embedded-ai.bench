@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -ex
 
+function prepare_env() {
+    sudo apt update
+    apt install -y wget unzip zip
+}
+
 ##################################
 # Prepare Caffe models
 ##################################
@@ -72,7 +77,19 @@ function tensorflow_model_urls() {
 
 function rename_tensorflow_models() {
     # TODO(ysh329): unzip models and rename with `tf` prefix
-    echo
+    # mobilenetv1
+    tar -zxvf ./mobilenet_v1_1.0_224_frozen.tgz
+    mv mobilenet_v1_1.0_224 tf_mobilenetv1
+
+    # mobilenetv2
+    tar -zxvf ./mobilenet_v2_1.0_224.tgz
+    mkdir tf_mobilenetv2
+    mv mobilenet_v2_1.0_224* ./tf_mobilenetv2/
+
+    # vgg16
+    tar -zxvf ./vgg_16_2016_08_28.tar.gz
+    mkdir tf_vgg16
+    mv vgg_16.ckpt ./tf_vgg16/tf_vgg16.ckpt
 }
 
 function prepare_tensorflow_models() {
@@ -94,8 +111,11 @@ function prepare_tensorflow_models() {
 
 
 function main() {
+    prepare_env
     prepare_caffe_models
     prepare_tensorflow_models
+
+    ls -lh
 }
 
 
@@ -103,5 +123,3 @@ function main() {
 # main
 ##################################
 main
-
-ls -lh

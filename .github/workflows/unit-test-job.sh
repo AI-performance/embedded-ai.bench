@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+source ~/.bashrc
+conda activate dev_env_py
 PYDIR_LIST=("./core" "./utils")
 
 # shellcheck disable=SC2068

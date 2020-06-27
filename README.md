@@ -2,7 +2,8 @@
 
 ![tnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/tnn-android-build/badge.svg)
 
-- 一键编译：拉取框架代码，编译；
+- 一键编译：拉取框架代码，编译库；
+- 一键转换：拉取原始模型、编译转换工具、转换模型；
 - 一键测速：拉取框架模型，测速。拉取框架模型，框架模型存放于不同的代码仓库中，执行测速过程会自动完成拉取。
 
 

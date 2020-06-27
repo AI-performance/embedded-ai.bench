@@ -53,6 +53,7 @@ function prepare_caffe_models() {
         wget -c $url
     done
     rename_caffe_models
+    ls -lh caffe*
 }
 
 ##################################
@@ -76,7 +77,19 @@ function rename_tensorflow_models() {
 
 function prepare_tensorflow_models() {
     # TODO(ysh329): download / unzip / rename tensorflow models
-    echo
+    links=$(tensorflow_model_urls)
+    for url in ${links[@]}; do
+        if [[ $url =~ "http" ]]; then
+            echo "skip non-links: ${url}"
+        else
+            continue
+        fi
+
+        echo "prepare downloading $url"
+        wget -c $url
+    done
+    rename_tensorflow_models
+    ls -lh tf*
 }
 
 
@@ -90,3 +103,5 @@ function main() {
 # main
 ##################################
 main
+
+ls -lh

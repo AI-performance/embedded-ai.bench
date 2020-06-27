@@ -1,9 +1,25 @@
 #!/usr/bin/env bash
 set -ex
 
+function get_platform() {
+    uname_a_str=`uname -a`
+    if [[ $uname_a_str =~ "Linux" ]]; then
+        echo "Linux"
+    elif [[ $uname_a_str =~ "Darwin" ]]; then
+        echo "Darwin"
+    else
+        echo "Unsupported for platform ${uname_a_str}"
+        exit 1
+    fi
+}
+
 function prepare_env() {
-    sudo apt update
-    apt install -y wget unzip zip
+    platform=$(get_platform)
+    echo $platform
+    if [[ $platform =~ "Linux" ]]; then
+        sudo apt update
+        apt install -y wget unzip zip
+    fi
 }
 
 ##################################
@@ -55,7 +71,7 @@ function prepare_caffe_models() {
         fi
 
         echo "prepare downloading $url"
-        wget -c $url
+        wget -cq $url
     done
     rename_caffe_models
     ls -lh caffe*
@@ -103,7 +119,7 @@ function prepare_tensorflow_models() {
         fi
 
         echo "prepare downloading $url"
-        wget -c $url
+        wget -cq $url
     done
     rename_tensorflow_models
     ls -lh tf*

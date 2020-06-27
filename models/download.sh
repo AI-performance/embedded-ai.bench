@@ -17,8 +17,15 @@ function prepare_env() {
     platform=$(get_platform)
     echo $platform
     if [[ $platform =~ "Linux" ]]; then
-        sudo apt update
-        sudo apt install -y wget unzip zip
+        if [`id -u` -eq 0 ]; then
+            echo "root user"
+            apt update
+            apt install -y wget unzip zip
+        else
+            echo "not root user"
+            sudo apt update
+            sudo apt install -y wget unzip zip
+        fi
     fi
 }
 

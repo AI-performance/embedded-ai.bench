@@ -32,8 +32,20 @@ function abort() {
 }
 
 function install_miniconda() {
-    #apt update
-    #apt install -y wget git
+    platform=$(get_platform)
+    echo $platform
+    if [[ $platform =~ "Linux" ]]; then
+        if [`id -u` -eq 0 ]; then
+            echo "root user"
+            apt update
+            apt install -y wget unzip zip git
+        else
+            echo "not root user"
+            sudo apt update
+            sudo apt install -y wget unzip zip git
+        fi
+    fi
+
     #cmd="conda"
     #is_conda_existed=`is_cmd_existed ${cmd}`
     #echo $is_conda_existed

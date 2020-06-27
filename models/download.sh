@@ -18,7 +18,7 @@ function prepare_env() {
     echo $platform
     if [[ $platform =~ "Linux" ]]; then
         sudo apt update
-        apt install -y wget unzip zip
+        sudo apt install -y wget unzip zip
     fi
 }
 

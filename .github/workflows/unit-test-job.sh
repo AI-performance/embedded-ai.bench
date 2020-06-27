@@ -1,9 +1,9 @@
 #!/bin/bash
 set -ex
 
-source ~/.bashrc
-conda init bash
-conda activate dev_env_py
+#source ~/.bashrc
+#conda init bash
+#conda activate dev_env_py
 PYDIR_LIST=("./core" "./utils")
 
 # shellcheck disable=SC2068
@@ -18,7 +18,7 @@ for py_dir in ${PYDIR_LIST[@]}; do
             echo "#>>>>>> py file: ${file}"
             cd ${py_dir}
             echo $(basename ${file})
-            python $(basename ${file})
+            python3 $(basename ${file})
             cd -
         fi
     done

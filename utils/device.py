@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
 import sys
@@ -68,6 +68,7 @@ def get_cpu_max_freqs(serial_num):
         )  # noqa
     cpu_max_freqs = list(cpu_max_freqs)
     cpu_max_freqs = cpu_max_freqs[:cpu_num]
+    # get str from list
     cpu_max_freqs = list(map(lambda l: l[0], cpu_max_freqs))
     logger.debug(
         "cpu_max_freqs:{}, cpu_num:{}".format(cpu_max_freqs, cpu_num)  # noqa

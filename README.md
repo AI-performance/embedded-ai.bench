@@ -51,6 +51,8 @@ conda activate dev_env_py
 pre-commit install
 ```
 
+> 若CI挂掉，查看[Github Action](https://github.com/AI-performance/embedded-ai.bench/actions)的具体日志，是否由于timeout如`git clone`仓库，这时可以`Re-run this jobs`重新运行。
+
 
 ## 单元测试
 

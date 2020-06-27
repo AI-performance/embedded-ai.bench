@@ -31,12 +31,12 @@ function rename_caffe_models() {
     mv mobilenet_v2.caffemodel caffe_mobilenetv2.caffemodel
 
     # squeezenetv1.1
-    mv deploy.prototxt squeezenetv1.1.prototxt
-    mv squeezenet_v1.1.caffemodel squeezenetv1.1.caffemodel
+    mv deploy.prototxt caffe_squeezenetv1.1.prototxt
+    mv squeezenet_v1.1.caffemodel caffe_squeezenetv1.1.caffemodel
 
     # vgg16
-    mv VGG_ILSVRC_16_layers_deploy.prototxt vgg16.prototxt
-    mv VGG_ILSVRC_16_layers.caffemodel vgg16.caffemodel
+    mv VGG_ILSVRC_16_layers_deploy.prototxt caffe_vgg16.prototxt
+    mv VGG_ILSVRC_16_layers.caffemodel caffe_vgg16.caffemodel
 }
 
 function prepare_caffe_models() {

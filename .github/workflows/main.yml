@@ -49,3 +49,10 @@ jobs:
     - name: Run tnn build
       run: cd tnn && ./build.sh
 
+  models:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: download official models
+      run: cd models && ./download.sh
+

@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+sudo apt-get install -y android-tools-adb
+
 #source ~/.bashrc
 #conda init bash
 #conda activate dev_env_py

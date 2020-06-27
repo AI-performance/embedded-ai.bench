@@ -55,14 +55,14 @@ class TestLog(unittest.TestCase):
             "{} {}".format(
                 self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
             )
-        )  # noqa
+        )
 
     def tearDown(self):
         print(
             "{} {}".format(
                 self.__class__.__name__, sys._getframe().f_code.co_name  # noqa
             )
-        )  # noqa
+        )
 
     def test_log(self):
         use_global_var = [True, False]

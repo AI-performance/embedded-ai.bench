@@ -7,9 +7,9 @@ import unittest
 
 sys.path.append("..")
 from core.global_config import logger  # noqa
-from utils.device import get_cpu_max_freqs, get_some_freq_idx  # noqa
+from utils.device import get_adb_devices, get_some_freq_idx, get_cpu_max_freqs  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
-from utils.misc import pattern_match  # noqa
+from utils.misc import pattern_match, get_file_name  # noqa
 
 
 class Engine:
@@ -29,7 +29,13 @@ class Engine:
         cmds = list()
         framework_name = self.config["framework_name"]
         model_repo = self.config["model_repo"]
-        clone_models_cmd = "git clone {}".format(model_repo)
+        repo_name = get_file_name(model_repo, False)
+        logger.info("repo_name:{}".format(repo_name))
+        logger.debug("os.path.exists:{}".format(os.path.exists(repo_name)))
+        if os.path.exists(repo_name):
+            clone_models_cmd = "ls {}".format(repo_name)
+        else:
+            clone_models_cmd = "git clone {}".format(model_repo)
         model_repo_version_cmd = (
             'cd ./{}-models/; git log --pretty=format:"SHA-1:%h date:%ad" '
             '--date=format:"%y-%m-%d" -n1 #--shortstat -n1'.format(
@@ -64,17 +70,14 @@ class Engine:
 
         # TODO(ysh329): add model_repo_version to config
         # self.config["model_repo_branch"] =
-        # cmd_handles[model_repo_branch_cmd].readlines()[0]
+        # cmd_handles[model_repo_branch_cmd][0]
         # self.config["model_repo_version"] =
         # cmd_handles[model_repo_version_cmd].readalines()[0]
         # self.config["model_repo_version_extra"] =
         # cmd_handles[model_repo_version_extra_cmd].readalines()[0]
 
         models_dir = list(
-            map(
-                lambda path: path.strip(),
-                cmd_handles[lookup_models_path_cmd].readlines(),
-            )
+            map(lambda path: path.strip(), cmd_handles[lookup_models_path_cmd])  # noqa
         )
 
         model_dict = dict()
@@ -98,21 +101,15 @@ class Engine:
 
     def prepare_devices(self):
         logger.info("==== {} ====".format(self.prepare_devices.__name__))
-        adb_devices_cmd = "adb devices"
-        cmd_handles = run_cmds([adb_devices_cmd])
-        serial_num_list = cmd_handles[adb_devices_cmd].readlines()[1:]
-        serial_num_list = list(
-            map(lambda device_line: device_line.strip(), serial_num_list)
-        )
-        serial_num_list = serial_num_list[: len(serial_num_list) - 1]
+
+        device_status_dict = get_adb_devices(True)
+        serial_num_list = list(device_status_dict.keys())
         logger.debug(serial_num_list)
 
         device_dict = dict()
         for sidx in range(len(serial_num_list)):
-            serial_num_line = serial_num_list[sidx]
-            serial_num_line = serial_num_line.split("\t")
-            device_serial_num = serial_num_line[0]
-            device_status = serial_num_line[1].strip()
+            device_serial_num = serial_num_list[sidx]
+            device_status = device_status_dict[device_serial_num]
             if device_status != "device":
                 logger.info(
                     "device {} status is {}, skipped".format(
@@ -167,7 +164,7 @@ class Engine:
                 " grep 'ro.board.platform'".format(device_serial_num)
             )
             cmd_handls = run_cmds([device_soc_cmd])
-            soc = cmd_handls[device_soc_cmd].readlines()[0]
+            soc = cmd_handls[device_soc_cmd][0]
             soc = soc.split(": ")[1].strip().replace("[", "").replace("]", "")  # noqa
             device_dict[device_serial_num]["soc"] = soc
             logger.debug(soc)
@@ -178,7 +175,7 @@ class Engine:
                 "grep 'ro.product.model'".format(device_serial_num)
             )
             cmd_handle = run_cmd(device_product_cmd)
-            product = cmd_handle.readlines()[0]
+            product = cmd_handle[0]
             product = (
                 product.split(": ")[1].strip().replace("[", "").replace("]", "")  # noqa
             )  # noqa
@@ -355,13 +352,13 @@ class Engine:
                                 }
                             )
                             cmd_handle = run_cmd(
-                                benchmark_cmd, bench_interval_second=3
+                                benchmark_cmd, wait_interval_sec=3  # noqa
                             )  # noqa
                             perf_dict = self.parse_benchmark(cmd_handle)
                             # summarize benchmark info
                             bench_record = {
                                 "soc": device_dict[device_serial_num]["soc"],
-                                "product": device_dict[device_serial_num][
+                                "product": device_dict[device_serial_num][  # noqa
                                     "product"
                                 ],  # noqa
                                 "serial_num": device_serial_num,
@@ -444,7 +441,7 @@ class Engine:
 
     def parse_benchmark(self, cmd_handle):
         logger.info("==== {} ====".format(self.parse_benchmark.__name__))
-        output_lines = cmd_handle.readlines()
+        output_lines = cmd_handle
         logger.debug(output_lines)
         output_lines = filter(lambda line: "time cost" in line, output_lines)
         output_lines = list(output_lines)

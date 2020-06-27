@@ -12,8 +12,8 @@ from utils.cmd import run_cmd, run_cmds  # noqa
 def get_adb_devices(is_print_status=False):
     device_dict = dict()
     adb_device_cmd = "adb devices"
-    h = run_cmd(adb_device_cmd)
-    devices = h.readlines()[1:]
+    res = run_cmd(adb_device_cmd)
+    devices = res[1:]
     devices = list(map(lambda devi: devi.split("\t"), devices))
     logger.info(devices)
     for didx in range(len(devices)):
@@ -35,8 +35,8 @@ def get_cpu_max_freqs(serial_num):
     check_cpu_num_cmd = "adb -s {} shell cat /proc/cpuinfo | grep processor".format(  # noqa
         serial_num
     )
-    cmd_handle = run_cmd(check_cpu_num_cmd)
-    cpu_num = len(cmd_handle.readlines())
+    cmd_res = run_cmd(check_cpu_num_cmd)
+    cpu_num = len(cmd_res)
     check_cpu_max_freq_cmd_pattern = (
         "adb -s {} shell cat "
         "/sys/devices/system/cpu/cpu{}/cpufreq/cpuinfo_max_freq"  # noqa
@@ -50,11 +50,9 @@ def get_cpu_max_freqs(serial_num):
     cmds = list(cmds)
 
     try:
-        cmd_handles = run_cmds(cmds)
-        # logger.info(cmd_handles[cmds[0]].readline())
-        cpu_max_freqs = map(
-            lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds
-        )
+        cmd_res_list = run_cmds(cmds)
+        logger.info(cmd_res_list[cmds[0]])
+        cpu_max_freqs = map(lambda cmd_key: cmd_res_list[cmd_key], cmds)
     except IndexError:
         logger.warn(
             "cat: /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq:"  # noqa
@@ -63,13 +61,14 @@ def get_cpu_max_freqs(serial_num):
         logger.warn("replacing scaling_max_freq with cpuinfo_max_freq")
         cmds = map(lambda c: c.replace("cpuinfo", "scaling"), cmds)
 
-        cmd_handles = run_cmds(cmds)
-        # logger.warn(cmd_handles[cmds[0]].readline().strip())
+        cmd_res_list = run_cmds(cmds)
+        # logger.warn(cmd_res_list[cmds[0]].strip())
         cpu_max_freqs = map(
-            lambda cmd_key: cmd_handles[cmd_key].readline().strip(), cmds
-        )
+            lambda cmd_key: cmd_res_list[cmd_key].strip(), cmds  # noqa
+        )  # noqa
     cpu_max_freqs = list(cpu_max_freqs)
     cpu_max_freqs = cpu_max_freqs[:cpu_num]
+    cpu_max_freqs = list(map(lambda l: l[0], cpu_max_freqs))
     logger.debug(
         "cpu_max_freqs:{}, cpu_num:{}".format(cpu_max_freqs, cpu_num)  # noqa
     )  # noqa

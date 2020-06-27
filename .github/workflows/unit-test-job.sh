@@ -2,6 +2,7 @@
 set -ex
 
 source ~/.bashrc
+conda init bash
 conda activate dev_env_py
 PYDIR_LIST=("./core" "./utils")
 

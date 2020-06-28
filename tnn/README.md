@@ -7,7 +7,7 @@ Only support build android.
 Build Android armv7 && armv8:
 
 ```shell
-./build.sh
+./build_tnn_android.sh
 ```
 
 ## benchmark

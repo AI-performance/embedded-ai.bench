@@ -3,6 +3,8 @@ set -ex
 
 function prepare_env() {
     # default
+    sudo apt update
+    sudo apt install -y setuptools
     pip3 install onnx==1.6.0 onnxruntime numpy onnx-simplifier
 
     # optional: tensorflow

@@ -3,7 +3,9 @@ set -ex
 
 function prepare_env() {
     # default
-    pip3 install setuptools onnx==1.6.0 onnxruntime numpy onnx-simplifier
+    python3 -m pip install --upgrade pip
+    pip3 install setuptools
+    pip3 install onnx==1.6.0 onnxruntime numpy onnx-simplifier
 
     # optional: tensorflow
     pip3 install tensorflow==1.15.0

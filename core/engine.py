@@ -9,7 +9,7 @@ sys.path.append("..")  # noqa
 from core.global_config import logger  # noqa
 from utils.device import (  # noqa
     get_adb_devices,
-    get_some_freq_idx,
+    get_target_freq_idx,
     get_cpu_max_freqs,
     get_battery_level,
 )  # noqa
@@ -131,11 +131,11 @@ class Engine:
             cpu_valid_freqs = list(
                 filter(lambda freq: freq is not None, cpu_max_freqs)
             )  # noqa
-            big_cores_idx = get_some_freq_idx(
+            big_cores_idx = get_target_freq_idx(
                 max(cpu_valid_freqs), device_serial_num, cpu_max_freqs
             )
             big_cores_idx_str = ",".join(big_cores_idx)
-            little_cores_idx = get_some_freq_idx(
+            little_cores_idx = get_target_freq_idx(
                 min(cpu_valid_freqs), device_serial_num, cpu_max_freqs
             )
             little_cores_idx_str = ",".join(little_cores_idx)

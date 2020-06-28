@@ -87,14 +87,14 @@ def get_cpu_max_freqs(serial_num):
     return cpu_max_freqs_ghz
 
 
-def get_some_freq_idx(freq, serial_num, cpu_max_freqs=None):
-    some_freq_idx_list = []
+def get_target_freq_idx(target_freq, serial_num, cpu_max_freqs=None):
+    target_freq_idx_list = []
     if cpu_max_freqs is None:
         cpu_max_freqs = get_cpu_max_freqs(serial_num)
     for idx, f in enumerate(cpu_max_freqs):
-        if f == freq:
-            some_freq_idx_list.append(str(idx))
-    return some_freq_idx_list
+        if f == target_freq:
+            target_freq_idx_list.append(str(idx))
+    return target_freq_idx_list
 
 
 def get_battery_level(serial_num):
@@ -138,10 +138,10 @@ class TestDevice(unittest.TestCase):
             cpus_max_freq = get_cpu_max_freqs(ser)
             max_freq = max(cpus_max_freq)
             min_freq = min(cpus_max_freq)
-            max_freq_cluster_idx = get_some_freq_idx(
+            max_freq_cluster_idx = get_target_freq_idx(
                 max_freq, ser, cpus_max_freq
             )  # noqa
-            min_freq_cluster_idx = get_some_freq_idx(
+            min_freq_cluster_idx = get_target_freq_idx(
                 min_freq, ser, cpus_max_freq
             )  # noqa
 

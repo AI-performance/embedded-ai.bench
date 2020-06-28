@@ -5,9 +5,14 @@ import os
 import sys
 import unittest
 
-sys.path.append("..")
+sys.path.append("..")  # noqa
 from core.global_config import logger  # noqa
-from utils.device import get_adb_devices, get_some_freq_idx, get_cpu_max_freqs  # noqa
+from utils.device import (  # noqa
+    get_adb_devices,
+    get_some_freq_idx,
+    get_cpu_max_freqs,
+    get_battery_level,
+)  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
 from utils.misc import pattern_match, get_file_name  # noqa
 
@@ -157,6 +162,11 @@ class Engine:
                     )  # noqa
                 )
                 exit(1)
+
+            # battery level
+            device_dict[device_serial_num]["battery_level"] = get_battery_level(  # noqa
+                device_serial_num
+            )
 
             # ro.board.platform, ro.board.chiptype, ro.board.hardware
             device_soc_cmd = (
@@ -378,6 +388,9 @@ class Engine:
                                 "cpu_max_freqs": device_dict[device_serial_num][  # noqa
                                     "cpu_max_freqs"
                                 ],
+                                "battery_level": device_dict[device_serial_num][  # noqa
+                                    "battery_level"
+                                ],
                                 "cmd": benchmark_cmd,
                             }
                             bench_dict[model_name].append(bench_record)
@@ -399,6 +412,7 @@ class Engine:
             "avg",
             "max",
             "min",
+            "battery_level",
             "repeats",
             "warmup",
         ]
@@ -426,6 +440,7 @@ class Engine:
                     record_dict["avg"],
                     record_dict["max"],
                     record_dict["min"],
+                    record_dict["battery_level"],
                     record_dict["repeats"],
                     record_dict["warmup"],
                 ]

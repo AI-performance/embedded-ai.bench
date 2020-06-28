@@ -97,6 +97,21 @@ def get_some_freq_idx(freq, serial_num, cpu_max_freqs=None):
     return some_freq_idx_list
 
 
+def get_battery_level(serial_num):
+    unset_battery_cmd = "adb -s {} shell dumpsys battery reset".format(  # noqa
+        serial_num
+    )
+    lookup_battery_cmd = (
+        "adb -s {} shell dumpsys battery"
+        " | grep level"
+        " | tr -cd 0-9".format(serial_num)
+    )
+    cmds = [unset_battery_cmd, lookup_battery_cmd]
+    cmd_res_dict = run_cmds(cmds)
+    battery_level = cmd_res_dict[lookup_battery_cmd][0]
+    return battery_level
+
+
 class TestDevice(unittest.TestCase):
     def setUp(self):
         logger.info(
@@ -130,12 +145,15 @@ class TestDevice(unittest.TestCase):
                 min_freq, ser, cpus_max_freq
             )  # noqa
 
+            battery_level = get_battery_level(ser)
+
             logger.info("sidx:{}, ser:{}, status:{}".format(sidx, ser, status))
             logger.info("cpus_max_freq:{}".format(cpus_max_freq))
             logger.info("max_freq:{}".format(max_freq))
             logger.info("max_freq_cluster_idx:{}".format(max_freq_cluster_idx))
             logger.info("min_freq:{}".format(min_freq))
             logger.info("min_freq_cluster_idx:{}".format(min_freq_cluster_idx))
+            logger.info("battery_level:{}".format(battery_level))
 
 
 if __name__ == "__main__":

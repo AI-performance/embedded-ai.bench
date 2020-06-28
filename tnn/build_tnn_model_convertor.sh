@@ -13,7 +13,10 @@ function prepare_env() {
     pip3 install onnxruntime
 
     # optional: caffe
-    sudo apt-get install libprotobuf-dev protobuf-compiler
+    sudo apt-get install -y libprotobuf-dev protobuf-compiler git
+
+    # default
+    git clone https://github.com/Tencent/tnn.git
 }
 
 function main() {

@@ -7,12 +7,18 @@ Only support build android.
 Build Android armv7 && armv8:
 
 ```shell
+cd <embedded-ai.bench>/tnn
 ./build_tnn_android.sh
 ```
 
 ## benchmark
 
 See `<embedded-ai.bench>/bench.py` and run it.
+
+```shell
+# root dir of project
+python ./bench.py
+```
 
 ## Appendix
 

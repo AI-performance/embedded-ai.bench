@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -ex
 
+function get_platform() {
+    uname_a_str=`uname -a`
+    if [[ $uname_a_str =~ "Linux" ]]; then
+        echo "Linux"
+    elif [[ $uname_a_str =~ "Darwin" ]]; then
+        echo "Darwin"
+    else
+        echo "Unsupported for platform ${uname_a_str}"
+        exit 1
+    fi
+}
+
 function prepare_env() {
     # default
     python3 -m pip install --upgrade pip
@@ -13,10 +25,22 @@ function prepare_env() {
     pip3 install onnxruntime
 
     # optional: caffe
-    sudo apt-get install -y libprotobuf-dev protobuf-compiler git
+    platform=$(get_platform)
+    echo "platform: $platform"
+    if [[ $platform =~ "Linux" ]]; then
+        sudo apt-get install -y libprotobuf-dev protobuf-compiler git
+    elif [[ $platform =~ "Darwin" ]]; then
+        #sudo chown -R $(whoami) /usr/local
+        #brew install -y libprotobuf-dev protobuf-compiler git
+        echo
+    fi
 
     # default
-    git clone https://github.com/Tencent/tnn.git
+    if [ ! -d "./tnn/" ];then
+        git clone https://github.com/Tencent/tnn.git
+    else
+        echo "skipped git clone tnn"
+    fi
 }
 
 function main() {

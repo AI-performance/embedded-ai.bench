@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -ex
 
+#alias wget_enhance='wget -c'
+enable_quiet_wget=ON
+
+function wget_enhance() {
+    url=$1
+    if [[ $enable_quiet_wget =~ ON ]]
+    then
+        wget -cq $url
+    else
+        wget -c $url
+    fi
+}
+
 function get_platform() {
     uname_a_str=`uname -a`
     if [[ $uname_a_str =~ "Linux" ]]; then
@@ -78,7 +91,7 @@ function prepare_caffe_models() {
         fi
 
         echo "prepare downloading $url"
-        wget -cq $url
+        wget_enhance $url
     done
     rename_caffe_models
     ls -lh caffe*
@@ -126,7 +139,7 @@ function prepare_tensorflow_models() {
         fi
 
         echo "prepare downloading $url"
-        wget -cq $url
+        wget_enhance $url
     done
     rename_tensorflow_models
     ls -lh tf*

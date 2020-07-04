@@ -6,7 +6,7 @@ import unittest
 sys.path.append("..")
 from utils.log import LoggerCreator  # noqa
 
-log_enable_debug = True
+log_enable_debug = False
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
 
@@ -21,9 +21,13 @@ def create_config(framework_name):
         config["model_repo_version"] = -1
         config["model_repo_version_extra"] = -1
         config["model_repo_branch"] = -1
+        config["model_repo_commit_id"] = -1
         config["device_work_dir"] = "/data/local/tmp/ai-performance/{}".format(
             framework_name
         )
+        # complete framework version
+        config["framework_repo_branch"] = -1
+        config["framework_repo_commit_id"] = -1
         config["framework_name"] = framework_name
         config["benchmark_platform"] = benchmark_platform
         for pidx in range(len(benchmark_platform)):

@@ -3,6 +3,7 @@
 
 import os
 import sys
+import time
 import unittest
 
 sys.path.append("..")  # noqa
@@ -21,6 +22,7 @@ class Engine:
     def __init__(self, config_dict):
         os.chdir(config_dict["work_dir"])
         self.config = config_dict
+        self.prepare_engine()
 
     def engine_name(self):
         return self.config["framework_name"]
@@ -28,6 +30,23 @@ class Engine:
     def set_config(self, key, value):
         self.config[key] = value
         return self.config
+
+    def prepare_engine(self):
+        logger.info("==== {} ====".format(self.prepare_engine.__name__))
+        branch = run_cmd("git branch")[0].replace("* ", "")
+        self.config["framework_repo_branch"] = branch
+        logger.info(
+            "framework_repo_branch:{}".format(
+                self.config["framework_repo_branch"]  # noqa
+            )  # noqa
+        )
+        commit_id = run_cmd("git rev-parse --short HEAD")[0]
+        self.config["framework_repo_commit_id"] = commit_id
+        logger.info(
+            "framework_repo_commit_id:{}".format(
+                self.config["framework_repo_commit_id"]
+            )
+        )
 
     def prepare_models(self):
         logger.info("==== {} ====".format(self.prepare_models.__name__))
@@ -474,23 +493,23 @@ class Engine:
 
     # TODO(ysh329): write summary with model verison, framework version
     def write_list_to_file(
-        self, bench_list, out_file_dir=None, suffix=".bench"
+        self, bench_list, out_file_dir=None, suffix=".bench.csv"
     ):  # noqa
         framework_name = self.config["framework_name"]
         if out_file_dir is None:
-            import time
-
             time_stamp_human = time.strftime(
                 "%Y%m%d-%H%M%S", time.localtime()  # noqa
             )  # noqa
             benchmark_platform = "".join(self.config["benchmark_platform"])
-            framework_version = str(1)
+            framework_repo_branch = self.config["framework_repo_branch"]
+            framework_repo_commit_id = self.config["framework_repo_commit_id"]
             model_version = str(1)  # noqa
             work_dir = self.config["work_dir"]  # noqa
             out_file_dir = "-".join(
                 [
                     framework_name,
-                    framework_version,
+                    framework_repo_branch,
+                    framework_repo_commit_id,
                     benchmark_platform,
                     time_stamp_human,
                 ]

@@ -30,7 +30,7 @@ function prepare_env() {
     platform=$(get_platform)
     echo $platform
     if [[ $platform =~ "Linux" ]]; then
-        if [`id -u` -eq 0 ]; then
+        if [ `id -u` -eq 0 ]; then
             echo "root user"
             apt update
             apt install -y wget unzip zip

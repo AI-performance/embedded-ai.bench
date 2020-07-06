@@ -1,5 +1,6 @@
 # embedded-ai.bench
 
+![ncnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/ncnn-android-build/badge.svg)  
 ![tnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/tnn-android-build/badge.svg)  
 ![mnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/mnn-android-build/badge.svg)
 

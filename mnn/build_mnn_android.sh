@@ -60,7 +60,7 @@ function build {
 }
 
 function main {
-#    prepare_env
+    prepare_env
     download_repo
     build
 }

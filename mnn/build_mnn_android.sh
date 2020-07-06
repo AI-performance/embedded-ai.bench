@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x
 
+readonly ANDROID_NDK_HOME=/opt/android-ndk-r17c
+
 function prepare_env {
     # attr, wget, unzip
     apt update
@@ -20,7 +22,6 @@ function prepare_env {
     # download Android NDK for linux-x86_64
     #    note: Skip this step if NDK installed
     #    ref: https://developer.android.com/ndk/downloads
-    readonly ANDROID_NDK_HOME=/opt/android-ndk-r17c
     if [ ! -d ${ANDROID_NDK_HOME} ]; then
         cd /tmp && wget -c https://dl.google.com/android/repository/android-ndk-r17c-linux-x86_64.zip
         cd /opt && unzip /tmp/android-ndk-r17c-linux-x86_64.zip
@@ -51,6 +52,7 @@ function build {
     cd -
 
     # build
+    export ANDROID_NDK=${ANDROID_NDK_HOME}
     cd project/android
     mkdir build_32 && cd build_32 && ../build_32.sh
     cd -

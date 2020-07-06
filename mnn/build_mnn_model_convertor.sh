@@ -22,8 +22,9 @@ function prepare_env() {
     platform=$(get_platform)
     echo "platform: $platform"
     if [[ $platform =~ "Linux" ]]; then
-        echo
+        apt install -y libprotobuf-dev protobuf-compiler
     elif [[ $platform =~ "Darwin" ]]; then
+	brew install protobuf
         #sudo chown -R $(whoami) /usr/local
         #brew install -y libprotobuf-dev protobuf-compiler git
         echo

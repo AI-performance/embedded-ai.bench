@@ -2,7 +2,7 @@
 set -ex
 
 #alias wget_enhance='wget -c'
-enable_quiet_wget=ON
+enable_quiet_wget=OFF
 
 function wget_enhance() {
     url=$1
@@ -32,12 +32,12 @@ function prepare_env() {
     if [[ $platform =~ "Linux" ]]; then
         if [ `id -u` -eq 0 ]; then
             echo "root user"
-            apt update
-            apt install -y wget unzip zip
+#            apt update
+#            apt install -y wget unzip zip
         else
             echo "not root user"
-            sudo apt update
-            sudo apt install -y wget unzip zip
+#            sudo apt update
+#            sudo apt install -y wget unzip zip
         fi
     fi
 }
@@ -102,7 +102,7 @@ function prepare_caffe_models() {
 ##################################
 function tensorflow_model_urls() {
     links_for_tensorflow=( \ # mobilenetv1
-                          "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v2_1.0_224.tgz" \
+                          "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224.tgz" \
                            \ # mobilenetv2
                           "https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz" \
                            \ # vgg16

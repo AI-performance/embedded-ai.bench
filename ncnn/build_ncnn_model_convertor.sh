@@ -41,17 +41,37 @@ function prepare_env() {
 
 function main() {
     prepare_env
+    platform=$(get_platform)
 
     # build
     cd ncnn
 
-    ##### linux host system with gcc/g++
-    mkdir -p build-host-gcc-linux
-    pushd build-host-gcc-linux
-    cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/host.gcc.toolchain.cmake ..
-    make -j4
-    make install
-    popd
+    if [[ $platform =~ "Linux" ]]; then
+        ##### linux host system with gcc/g++
+        mkdir -p build-host-gcc-linux
+        pushd build-host-gcc-linux
+        cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/host.gcc.toolchain.cmake ..
+        make -j4
+        make install
+        popd
+        make caffe2ncnn -j4
+        make ncnnoptimize -j4
+    elif [[ $platform =~ "Darwin" ]]; then
+        ##### MacOS
+        mkdir -p build-mac
+        pushd build-mac
+        cmake   -DNCNN_OPENMP=OFF \
+                -DNCNN_OPENCV=ON \
+                -DNCNN_BENCHMARK=ON \
+                ..
+        make -j 8
+        make install
+        make ncnnoptimize -j4
+        make caffe2ncnn -j4
+        popd
+    fi
+
+
 }
 
 main

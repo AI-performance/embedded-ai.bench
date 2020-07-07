@@ -102,9 +102,9 @@ function prepare_caffe_models() {
 ##################################
 function tensorflow_model_urls() {
     links_for_tensorflow=( \ # mobilenetv1
-                          "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz" \
+                          "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v2_1.0_224.tgz" \
                            \ # mobilenetv2
-                          "https://storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_1.0_224.tgz" \
+                          "https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz" \
                            \ # vgg16
                           "http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz" \
                          )
@@ -114,12 +114,17 @@ function tensorflow_model_urls() {
 function rename_tensorflow_models() {
     # TODO(ysh329): unzip models and rename with `tf` prefix
     # mobilenetv1
-    tar -zxvf ./mobilenet_v1_1.0_224_frozen.tgz
-    mv mobilenet_v1_1.0_224 tf_mobilenetv1
+    tar -zxvf ./mobilenet_v1_1.0_224.tgz
+    mv mobilenet_v1_1.0_224.tflite tf_mobilenetv1.tflite
+    mkdir tf_mobilenetv1
+    mv tf_mobilenetv1.* tf_mobilenetv1
+    mv mobilenet_v1_1.0_224* tf_mobilenetv1
 
     # mobilenetv2
     tar -zxvf ./mobilenet_v2_1.0_224.tgz
     mkdir tf_mobilenetv2
+    mv mobilenet_v2_1.0_224.tflite tf_mobilenetv2.tflite
+    mv tf_mobilenetv2.tflite ./tf_mobilenetv2
     mv mobilenet_v2_1.0_224* ./tf_mobilenetv2/
 
     # vgg16

@@ -58,6 +58,7 @@ def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=100):
     cmd_res = None
     if subp_status == 0:
         cmd_res = subp.communicate()[0]
+        logger.debug("cmd_res:\n{}".format(cmd_res))
         cmd_res = cmd_res.split("\n")
         cmd_res = filter(lambda r: r != "", cmd_res)
         cmd_res = list(cmd_res)

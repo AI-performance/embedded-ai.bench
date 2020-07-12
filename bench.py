@@ -15,7 +15,7 @@ def main():
 
     tnn.prepare_models_for_devices()
     tnn.prepare_benchmark_assets_for_devices()
-    bench_dict = tnn.benchmark()
+    bench_dict = tnn.run_bench()
     bench_str_list = tnn.generate_benchmark_summary(bench_dict)
     tnn.write_list_to_file(bench_str_list)
 

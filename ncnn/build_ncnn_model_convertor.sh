@@ -53,9 +53,9 @@ function main() {
         cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/host.gcc.toolchain.cmake ..
         make -j4
         make install
-        popd
         make caffe2ncnn -j4
         make ncnnoptimize -j4
+        popd
     elif [[ $platform =~ "Darwin" ]]; then
         ##### MacOS
         mkdir -p build-mac

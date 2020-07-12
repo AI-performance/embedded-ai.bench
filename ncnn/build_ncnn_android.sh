@@ -1,9 +1,11 @@
-#!/bin/bash
+ #!/usr/bin/env bash
 set -x
 
-readonly ANDROID_NDK_HOME=/opt/android-ndk-r17c
+PWD=$(pwd)
 
-function prepare_env {
+export ANDROID_NDK=/opt/android-ndk-r17c
+
+echo "=========================== prepare_env ==============================="
     # attr, wget, unzip
     apt update
     apt install -y --no-install-recommends attr wget unzip
@@ -36,71 +38,57 @@ function prepare_env {
     # setup env
     export VULKAN_SDK=`pwd`/1.1.114.0/x86_64
 
-    cd -
-}
+    cd $PWD
 
 # download code repo from github
-function download_repo {
+echo "========================= download_repo ============================"
+    cd $PWD
+
     # download repo
     if [ ! -d "./ncnn" ]; then
         git clone https://github.com/tencent/ncnn.git ncnn
     else
         echo "local ncnn repo exited"
     fi
-}
+
 
 # compile tnn
-function build {
+echo "========================= build ====================================="
     # replace
     cp benchncnn.cpp ./ncnn/benchmark/benchncnn.cpp 
     cd ncnn
 
-    # generate
-    cd schema && ./generate.sh
-    cd -
-
     # build
-    export ANDROID_NDK=${ANDROID_NDK_HOME}
-    cd ncnn
-
     ##### android armv7
-    mkdir -p build-android-armv7
-    pushd build-android-armv7
-    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-19 ..
-    make -j4
-    make install
-    popd
+#    mkdir -p build-android-armv7
+#    pushd build-android-armv7
+#    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-19 ..
+#    make -j4
+#    make install
+#    popd
 
     ##### android aarch64
-    mkdir -p build-android-aarch64
-    pushd build-android-aarch64
-    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-21 ..
+#    mkdir -p build-android-aarch64
+#    pushd build-android-aarch64
+#    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-21 ..
+#    make -j4
+#    make install
+#    popd
+
+    ##### android armv7 vulkan
+    mkdir -p build-android-armv7-vulkan
+    pushd build-android-armv7-vulkan
+    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-24 -DNCNN_VULKAN=ON ..
     make -j4
     make install
     popd
 
-    ##### android armv7 vulkan
-#    mkdir -p build-android-armv7-vulkan
-#    pushd build-android-armv7-vulkan
-#    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-24 -DNCNN_VULKAN=ON ..
-#    make -j4
-#    make install
-#    popd
-
     ##### android aarch64 vulkan
-#    mkdir -p build-android-aarch64-vulkan
-#    pushd build-android-aarch64-vulkan
-#    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-24 -DNCNN_VULKAN=ON ..
-#    make -j4
-#    make install
-#    popd
+    mkdir -p build-android-aarch64-vulkan
+    pushd build-android-aarch64-vulkan
+    cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-24 -DNCNN_VULKAN=ON ..
+    make -j4
+    make install
+    popd
 
-}
 
-function main {
-    prepare_env
-    download_repo
-    build
-}
-
-main ${@}

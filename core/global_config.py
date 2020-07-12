@@ -18,8 +18,10 @@ def create_config(framework_name):
         # note(ysh329):
         # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
         config["work_dir"] = "./{}".format(framework_name)
-        config["model_repo"] = "https://gitee.com/yuens/{}-models.git".format(
-            framework_name
+        config[
+            "model_repo"
+        ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
+            framework_name  # noqa
         )
         config["model_type_keyword"] = framework_name
         # complete model version during `prepare_models`

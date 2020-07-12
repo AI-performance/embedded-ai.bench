@@ -671,7 +671,9 @@ class TestEngine(unittest.TestCase):
         ncnn.set_config(
             "benchmark_platform", ["android-armv8", "android-armv7"]  # noqa
         )
-        ncnn.set_config("support_backend", ["-1", "0"])  # -1: cpu, 0: gpu
+        ncnn.set_config(
+            "support_backend", ["0"]
+        )  # ["-1", "0"])  # -1: cpu, 0: gpu # noqa
         ncnn.set_config("cpu_thread_num", [1, 2, 4])
         ncnn.config["repeats"] = 10
         ncnn.config["warmup"] = 2

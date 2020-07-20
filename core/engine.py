@@ -713,7 +713,7 @@ class TestEngine(unittest.TestCase):
         return 0
     #"""
 
-    # """
+    """
     def test_ncnn_engine(self):
         from core.global_config import create_config
 
@@ -750,11 +750,9 @@ class TestEngine(unittest.TestCase):
         summary_str = "\n".join(summary_list)
         logger.info("summary_str:\n{}".format(summary_str))
         return 0
-        # """
+    """
 
     def test_mnn_engine(self):
-        pass
-        """
         from core.global_config import create_config
 
         framework_name = "mnn"
@@ -762,9 +760,7 @@ class TestEngine(unittest.TestCase):
         config_dict["work_dir"] = os.getcwd() + "/../mnn"
 
         mnn = Engine(config_dict)
-        mnn.set_config(
-            "benchmark_platform", ["android-armv8", "android-armv7"]  # noqa
-        )
+        mnn.set_config("benchmark_platform", ["android-armv8", "android-armv7"])  # noqa
 
         mnn.set_config(
             "support_backend", ["-1", "0"]
@@ -772,8 +768,9 @@ class TestEngine(unittest.TestCase):
         mnn.set_config("cpu_thread_num", [1, 2, 4])
         mnn.config["repeats"] = 10
         mnn.config["warmup"] = 2
-        model_dict = mnn.prepare_models()
+        model_dict = mnn.prepare_models()  # noqa
 
+        """
         device_dict = mnn.prepare_devices()
         if len(device_dict) == 0:
             logger.error("no device found")

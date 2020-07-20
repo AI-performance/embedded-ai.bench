@@ -23,6 +23,13 @@
     3. 每个Engine实例在执行过程中会拉取各自独立模型仓库的模型，为bench做准备。
     
     
+## LICENSE
+
+禁止除AI-Performance开源组织以外的主体，【公开】发布【基于本项目的benchmark结果】，若公开发布则视为侵权，AI-Performance有权追诉法律责任。
+
+AI-Performance开源组织，以中立、公平、公正、公开为组织准则，致力于打造制定AI领域的benchmark标准。
+    
+    
 ## 开发须知
 
 首次提交代码需执行以下命令，安装钩子。安装成功后，每次执行`git commit`后会自动检查`.pre-commit-config.yaml`里设定的检查项，如目前是针对Python代码做格式检查。

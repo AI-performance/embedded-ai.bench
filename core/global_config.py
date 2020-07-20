@@ -150,7 +150,7 @@ def create_config(framework_name):
             "adb -s {serial_num} shell {device_benchmark_bin} {model_dir}"
             " {repeats} {warmup} {thread_num} {power_mode} {gpu_device}"
         )
-    elif config["framework_name"] == "mnn":
+    elif framework_name == "mnn":
         # note(ysh329):
         # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
         config["work_dir"] = "./{}".format(framework_name)

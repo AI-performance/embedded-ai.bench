@@ -123,7 +123,7 @@ def get_system_version(serial_num):
 
 
 def get_imei(serial_num):
-    lookup_imei_cmd = "adb -s {} shell" " service call iphonesubinfo 1".format(
+    lookup_imei_cmd = "adb -s {} shell service call iphonesubinfo 1".format(  # noqa
         serial_num
     )
     imei_list = run_cmd(lookup_imei_cmd)

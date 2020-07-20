@@ -7,6 +7,7 @@ import unittest
 sys.path.append("..")
 from core.global_config import logger  # noqa
 from utils.cmd import run_cmd, run_cmds  # noqa
+from utils.misc import pattern_match  # noqa
 
 
 def get_adb_devices(is_print_status=False):
@@ -112,6 +113,33 @@ def get_battery_level(serial_num):
     return battery_level
 
 
+def get_system_version(serial_num):
+    lookup_sys_ver_cmd = "adb -s {} shell getprop ro.build.version.release".format(  # noqa
+        serial_num
+    )
+    sys_ver = run_cmd(lookup_sys_ver_cmd)[0]
+    logger.debug("system_version:{}".format(sys_ver))
+    return sys_ver
+
+
+def get_imei(serial_num):
+    lookup_imei_cmd = "adb -s {} shell" " service call iphonesubinfo 1".format(
+        serial_num
+    )
+    imei_list = run_cmd(lookup_imei_cmd)
+    imei_list = list(filter(lambda l: "." in l, imei_list))
+    assert 0 < len(imei_list)
+    imei_list = list(
+        map(lambda l: pattern_match(l, "'", "'", False), imei_list)
+    )  # noqa
+    logger.debug("imei_list:{}".format(imei_list))
+    imei_list = map(lambda l: l.replace(".", ""), imei_list)
+    imei = "".join(imei_list)
+    imei = imei.replace(" ", "")
+    logger.debug("imei:{}".format(imei))
+    return imei
+
+
 class TestDevice(unittest.TestCase):
     def setUp(self):
         logger.info(
@@ -146,6 +174,8 @@ class TestDevice(unittest.TestCase):
             )  # noqa
 
             battery_level = get_battery_level(ser)
+            system_version = get_system_version(ser)
+            imei = get_imei(ser)
 
             logger.info("sidx:{}, ser:{}, status:{}".format(sidx, ser, status))
             logger.info("cpus_max_freq:{}".format(cpus_max_freq))
@@ -154,6 +184,8 @@ class TestDevice(unittest.TestCase):
             logger.info("min_freq:{}".format(min_freq))
             logger.info("min_freq_cluster_idx:{}".format(min_freq_cluster_idx))
             logger.info("battery_level:{}".format(battery_level))
+            logger.info("system_version:{}".format(system_version))
+            logger.info("imei:{}".format(imei))
 
 
 if __name__ == "__main__":

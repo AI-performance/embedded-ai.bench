@@ -28,7 +28,7 @@ def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=100):
     while 1:
         if subp.poll() == 0:
             logger.debug("{} finished".format(cmd_type))
-            subp_status = subp.poll()
+            subp_status = int(subp.poll())
             break
         elif subp.poll() is None:
             logger.debug(
@@ -45,20 +45,24 @@ def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=100):
                 subp.kill()
                 break
         else:
-            logger.error(
+            subp_status = subp.poll()
+            logger.fatal(
                 "exited with abnormal subprocess status: {}".format(  # noqa
-                    subp.poll()
+                    subp_status
                 )  # noqa
             )
-            exit(1)
+            if subp_status == 139:
+                break
+            else:
+                exit(1)
     logger.debug(
         "{} consume {} seconds to finish".format(cmd_type, duration_sec)  # noqa
     )  # noqa
 
     cmd_res = None
-    if subp_status == 0:
-        cmd_res = subp.communicate()[0]
-        logger.debug("cmd_res:\n{}".format(cmd_res))
+    if subp_status == 0 or subp_status == 139:
+        cmd_res = "".join(subp.communicate())
+        logger.debug("cmd_res:{}".format(subp.communicate()))
         cmd_res = cmd_res.split("\n")
         cmd_res = filter(lambda r: r != "", cmd_res)
         cmd_res = list(cmd_res)

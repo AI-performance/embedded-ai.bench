@@ -1,7 +1,38 @@
 # Default ignored files
 
+# bench
+*.csv
+
 # temp
+.github/miniconda3/
+.github/Miniconda3-latest-MacOSX-x86_64.sh
 tmp/
+*.gz
+
+# mnn
+mnn/mnn-models/
+mnn/mnn/
+
+models/mobilenet_v2_1.0_224.ckpt.data-00000-of-00001
+models/mobilenet_v2_1.0_224.tgz
+*.mnn
+
+# models
+models/tf_mobilenetv1/
+models/tf_mobilenetv2/
+
+# caffe
+*.caffemodel
+*.prototxt
+
+# ncnn
+*.param
+*.bin
+*.proto
+ncnn/1.1.114.0/
+ncnn/ckpt2ncnn/
+ncnn/ncnn-models/
+ncnn/ncnn/
 
 # tnn
 tnn/tnn-models/

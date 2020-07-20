@@ -8,11 +8,14 @@ import unittest
 
 sys.path.append("..")  # noqa
 from core.global_config import logger  # noqa
+from core.standard import get_repeats_from_backend  # noqa
 from utils.device import (  # noqa
     get_adb_devices,
     get_target_freq_idx,
     get_cpu_max_freqs,
     get_battery_level,
+    get_system_version,
+    get_imei,
 )  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
 from utils.misc import pattern_match, get_file_name  # noqa
@@ -33,14 +36,20 @@ class Engine:
 
     def prepare_engine(self):
         logger.info("==== {} ====".format(self.prepare_engine.__name__))
-        branch = run_cmd("git branch")[0].replace("* ", "")
+        lookup_branch_name_cmd = "cd {}; git branch".format(
+            self.config["framework_name"]
+        )
+        branch = run_cmd(lookup_branch_name_cmd)[0].replace("* ", "")
         self.config["framework_repo_branch"] = branch
         logger.info(
             "framework_repo_branch:{}".format(
                 self.config["framework_repo_branch"]  # noqa
             )  # noqa
         )
-        commit_id = run_cmd("git rev-parse --short HEAD")[0]
+        lookup_commit_id_cmd = "cd {}; git rev-parse --short HEAD".format(
+            self.config["framework_name"]
+        )
+        commit_id = run_cmd(lookup_commit_id_cmd)[0]
         self.config["framework_repo_commit_id"] = commit_id
         logger.info(
             "framework_repo_commit_id:{}".format(
@@ -192,6 +201,16 @@ class Engine:
             device_dict[device_serial_num]["battery_level"] = get_battery_level(  # noqa
                 device_serial_num
             )
+
+            # system version
+            device_dict[device_serial_num][
+                "system_version"
+            ] = get_system_version(  # noqa
+                device_serial_num
+            )
+
+            # imie
+            device_dict[device_serial_num]["imei"] = get_imei(device_serial_num)  # noqa
 
             # ro.board.platform, ro.board.chiptype, ro.board.hardware
             device_soc_cmd = (
@@ -392,7 +411,9 @@ class Engine:
                                         ],  # noqa
                                         "model_dir": model_dir,
                                         "backend": backend,
-                                        "repeats": self.config["repeats"],
+                                        "repeats": self.config["repeats"](
+                                            backend
+                                        ),  # noqa
                                         "warmup": self.config["warmup"],
                                         "thread_num": cpu_thread_num,
                                         "bind_cpu_idx": device_dict[
@@ -403,13 +424,14 @@ class Engine:
                                     }
                                 )
                             elif self.config["framework_name"] == "ncnn":
-                                # TODO(ysh329): add benchmark dict
                                 bench_cmd = bench_cmd_pattern.format(
                                     **{
                                         "serial_num": device_serial_num,
                                         "device_benchmark_bin": device_benchmark_bin,  # noqa
                                         "model_dir": model_dir,
-                                        "repeats": self.config["repeats"],
+                                        "repeats": self.config["repeats"](
+                                            backend
+                                        ),  # noqa
                                         "warmup": self.config["warmup"],
                                         "thread_num": cpu_thread_num,
                                         "power_mode": self.config[
@@ -418,7 +440,6 @@ class Engine:
                                         "gpu_device": backend,
                                     }
                                 )
-                                pass
                             cmd_handle = run_cmd(
                                 bench_cmd, wait_interval_sec=3  # noqa
                             )  # noqa
@@ -432,7 +453,7 @@ class Engine:
                                 "serial_num": device_serial_num,
                                 "platform": platform,
                                 "model_name": model_name,
-                                "repeats": self.config["repeats"],
+                                "repeats": self.config["repeats"](backend),
                                 "warmup": self.config["warmup"],
                                 "avg": perf_dict["avg"],
                                 "max": perf_dict["max"],
@@ -449,7 +470,13 @@ class Engine:
                                 "battery_level": device_dict[device_serial_num][  # noqa
                                     "battery_level"
                                 ],
+                                "system_version": device_dict[
+                                    device_serial_num
+                                ][  # noqa
+                                    "system_version"
+                                ],
                                 "cmd": bench_cmd,
+                                "imei": device_dict[device_serial_num]["imei"],
                             }
                             bench_dict[model_name].append(bench_record)
                             logger.info(bench_record)
@@ -471,8 +498,10 @@ class Engine:
             "max",
             "min",
             "battery_level",
+            "system_version",
             "repeats",
             "warmup",
+            "imei",
         ]
         summary_header_str = ",".join(summary_header)
         summary = [summary_header_str]
@@ -500,8 +529,10 @@ class Engine:
                         record_dict["max"],
                         record_dict["min"],
                         record_dict["battery_level"],
+                        record_dict["system_version"],
                         record_dict["repeats"],
                         record_dict["warmup"],
+                        record_dict["imei"],
                     ]
                 elif self.config["framework_name"] == "ncnn":
                     backend_id_to_str_dict = self.config[
@@ -519,8 +550,10 @@ class Engine:
                         record_dict["max"],
                         record_dict["min"],
                         record_dict["battery_level"],
+                        record_dict["system_version"],
                         record_dict["repeats"],
                         record_dict["warmup"],
+                        record_dict["imei"],
                     ]
                 else:
                     logger.fatal(
@@ -558,19 +591,29 @@ class Engine:
             benchmark["max"] = pattern_match(line, "max=", "ms", False)
             benchmark["avg"] = pattern_match(line, "avg=", "ms", False)
         elif self.config["framework_name"] == "ncnn":
-            pass
-            output_lines = filter(lambda line: "min = " in line, output_lines)
-            output_lines = list(output_lines)
-            logger.debug("output_lines:\n{}".format(output_lines))
-            assert len(output_lines) == 1
-            line = output_lines[0]
-            line = line.split()
-            logger.debug(line)
-            line = "".join(line) + "END"
-            benchmark["min"] = pattern_match(line, "min=", "max", False)
-            benchmark["max"] = pattern_match(line, "max=", "avg", False)
-            benchmark["avg"] = pattern_match(line, "avg=", "END", False)
-            logger.info("benchmark:{}".format(benchmark))
+            is_no_vulkan = list(
+                filter(lambda line: "no vulkan device" in line, output_lines)
+            )
+            is_no_vulkan = len(is_no_vulkan) > 0
+            if is_no_vulkan:
+                benchmark["min"] = 0.0
+                benchmark["max"] = 0.0
+                benchmark["avg"] = 0.0
+            else:
+                output_lines = filter(
+                    lambda line: "min = " in line, output_lines
+                )  # noqa
+                output_lines = list(output_lines)
+                logger.debug("output_lines:\n{}".format(output_lines))
+                assert len(output_lines) == 1
+                line = output_lines[0]
+                line = line.split()
+                logger.debug(line)
+                line = "".join(line) + "END"
+                benchmark["min"] = pattern_match(line, "min=", "max", False)
+                benchmark["max"] = pattern_match(line, "max=", "avg", False)
+                benchmark["avg"] = pattern_match(line, "avg=", "END", False)
+        logger.info("benchmark:{}".format(benchmark))
         assert len(benchmark) != 0
         return benchmark
 
@@ -629,6 +672,7 @@ class TestEngine(unittest.TestCase):
             )  # noqa
         )
 
+    """
     def test_tnn_engine(self):
         from core.global_config import create_config
 
@@ -659,7 +703,9 @@ class TestEngine(unittest.TestCase):
         summary_str = "\n".join(summary_list)
         logger.info("summary_str:\n{}".format(summary_str))
         return 0
+    #"""
 
+    # """
     def test_ncnn_engine(self):
         from core.global_config import create_config
 
@@ -671,18 +717,18 @@ class TestEngine(unittest.TestCase):
         ncnn.set_config(
             "benchmark_platform", ["android-armv8", "android-armv7"]  # noqa
         )
-        ncnn.set_config(
-            "support_backend", ["0"]
-        )  # ["-1", "0"])  # -1: cpu, 0: gpu # noqa
+        ncnn.set_config("support_backend", ["0"])  # -1: cpu, 0: gpu # noqa
         ncnn.set_config("cpu_thread_num", [1, 2, 4])
-        ncnn.config["repeats"] = 10
+        ncnn.config["repeats"] = (
+            lambda backend: 100 if backend == "VULKAN" else 1000
+        )  # noqa
         ncnn.config["warmup"] = 2
         model_dict = ncnn.prepare_models()
 
         device_dict = ncnn.prepare_devices()
         if len(device_dict) == 0:
             logger.error("no device found")
-            # return 0
+            return 0
         config_dict = ncnn.set_config("model_dict", model_dict)
         config_dict = ncnn.set_config("device_dict", device_dict)
 
@@ -695,6 +741,48 @@ class TestEngine(unittest.TestCase):
 
         summary_str = "\n".join(summary_list)
         logger.info("summary_str:\n{}".format(summary_str))
+        return 0
+        # """
+
+    def test_mnn_engine(self):
+        pass
+        """
+        from core.global_config import create_config
+
+        framework_name = "mnn"
+        config_dict = create_config(framework_name)
+        config_dict["work_dir"] = os.getcwd() + "/../mnn"
+
+        mnn = Engine(config_dict)
+        mnn.set_config(
+            "benchmark_platform", ["android-armv8", "android-armv7"]  # noqa
+        )
+
+        mnn.set_config(
+            "support_backend", ["-1", "0"]
+        )  # ["-1", "0"])  # -1: cpu, 0: gpu # noqa
+        mnn.set_config("cpu_thread_num", [1, 2, 4])
+        mnn.config["repeats"] = 10
+        mnn.config["warmup"] = 2
+        model_dict = mnn.prepare_models()
+
+        device_dict = mnn.prepare_devices()
+        if len(device_dict) == 0:
+            logger.error("no device found")
+            return 0
+        config_dict = mnn.set_config("model_dict", model_dict)
+        config_dict = mnn.set_config("device_dict", device_dict)
+
+        mnn.prepare_models_for_devices()
+        mnn.prepare_benchmark_assets_for_devices()
+
+        bench_dict = mnn.run_bench()
+        summary_list = mnn.generate_benchmark_summary(bench_dict)
+        mnn.write_list_to_file(summary_list)
+
+        summary_str = "\n".join(summary_list)
+        logger.info("summary_str:\n{}".format(summary_str))
+        """
         return 0
 
 

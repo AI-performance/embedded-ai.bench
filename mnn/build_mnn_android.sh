@@ -45,6 +45,7 @@ function download_repo {
 
 # compile tnn
 function build {
+    cp MNNV2Basic.cpp ./mnn/tools/cpp/MNNV2Basic.cpp
     cd mnn
 
     # generate

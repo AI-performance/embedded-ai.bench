@@ -8,7 +8,6 @@ import unittest
 
 sys.path.append("..")  # noqa
 from core.global_config import logger  # noqa
-from core.standard import get_repeats_from_backend  # noqa
 from utils.device import (  # noqa
     get_adb_devices,
     get_target_freq_idx,
@@ -487,6 +486,9 @@ class Engine:
             "==== {} ====".format(self.generate_benchmark_summary.__name__)
         )  # noqa
         summary_header = [
+            "framework",
+            "branch",
+            "commit_id",
             "model_name",
             "platform",
             "soc",
@@ -518,6 +520,9 @@ class Engine:
                 logger.info(record_dict)
                 if self.config["framework_name"] == "tnn":
                     record = [
+                        self.config["framework_name"],
+                        self.config["framework_repo_branch"],
+                        self.config["framework_repo_commit_id"],
                         record_dict["model_name"],
                         record_dict["platform"],
                         record_dict["soc"],
@@ -539,6 +544,9 @@ class Engine:
                         "backend_id_to_str_dict"
                     ]  # noqa
                     record = [
+                        self.config["framework_name"],
+                        self.config["framework_repo_branch"],
+                        self.config["framework_repo_commit_id"],
                         record_dict["model_name"],
                         record_dict["platform"],
                         record_dict["soc"],

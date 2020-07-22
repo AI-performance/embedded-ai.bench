@@ -16,6 +16,9 @@ def create_config(framework_name):
     config = dict()
     config["warmup"] = 20
     if framework_name == "tnn":
+        # note(ysh329):
+        # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
+        config["work_dir"] = "./{}".format(framework_name)
 
         def backend_to_repeats(backend):
             if backend == "OPENCL":
@@ -24,9 +27,6 @@ def create_config(framework_name):
                 return 100
 
         config["repeats"] = backend_to_repeats
-        # note(ysh329):
-        # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
-        config["work_dir"] = "./{}".format(framework_name)
         config[
             "model_repo"
         ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
@@ -72,6 +72,9 @@ def create_config(framework_name):
             'repeats} -wc {warmup} -th {thread_num} -dl {bind_cpu_idx}" '
         )
     elif framework_name == "ncnn":
+        # note(ysh329):
+        # https://github.com/Tencent/ncnn/tree/master/benchmark/README.md
+        config["work_dir"] = "./{}".format(framework_name)
 
         def backend_to_repeats(backend):
             if backend == "VULKAN":
@@ -80,9 +83,6 @@ def create_config(framework_name):
                 return 100
 
         config["repeats"] = backend_to_repeats
-        # note(ysh329):
-        # https://github.com/Tencent/ncnn/tree/master/benchmark/README.md
-        config["work_dir"] = "./{}".format(framework_name)
         config[
             "model_repo"
         ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
@@ -114,17 +114,17 @@ def create_config(framework_name):
 
         # gpu device: -1=cpu-only, 0=gpu0, 1=gpu1 ...
         def support_backend_id(backend="ARM"):
-            if backend.upper() == "ARM":
-                return -1
-            elif backend.upper() == "VULKAN":
-                return 0
-            else:
-                logger.error("Unsupported backend: {}".format(backend))
-                logger.error("use ARM instead")
-                return -1
+            backend = str(backend)
+            backend_dict = {
+                "-1": "ARM",
+                "ARM": "-1",  # noqa
+                "0": "VULKAN",
+                "VULKAN": "0",
+            }
+            return backend_dict[backend]
 
+        config["support_backned_id"] = support_backend_id
         config["support_backends"] = ["ARM", "VULKAN"]
-        config["backend_id_to_str_dict"] = {"-1": "ARM", "0": "VULKAN"}
         config["is_cpu_backend"] = lambda backend_id: str(backend_id) == "-1"
         config["support_backend"] = list(
             map(support_backend_id, config["support_backends"])
@@ -151,9 +151,25 @@ def create_config(framework_name):
             " {repeats} {warmup} {thread_num} {power_mode} {gpu_device}"
         )
     elif framework_name == "mnn":
-        # note(ysh329):
-        # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
+        # note(ysh329): https://www.yuque.com/mnn/cn/tool_benchmark
         config["work_dir"] = "./{}".format(framework_name)
+
+        # 0->CPU，1->Metal，3->OpenCL，6->OpenGL，7->Vulkan
+        def backend_to_repeats(backend):
+            backend = str(backend)
+            if (
+                backend == "OPENCL"
+                or backend == "3"
+                or backend == "OPENGL"
+                or backend == "6"
+                or backend == "VULKAN"
+                or backend == "7"
+            ):
+                return 1000
+            else:
+                return 100
+
+        config["repeats"] = backend_to_repeats
         config[
             "model_repo"
         ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
@@ -176,27 +192,55 @@ def create_config(framework_name):
         for pidx in range(len(benchmark_platform)):
             platform = benchmark_platform[pidx]
             config[platform] = dict()
-            config[platform][
-                "shared_lib"
-            ] = "./tnn/scripts/build{}/libTNN.so".format(  # noqa
-                32 if "v7" in platform else 64
+            shared_libs = [
+                "libMNN.so",
+                "libMNN_CL.so",
+                "libMNN_GL.so",
+                "libMNN_Vulkan.so",
+                "libMNN_Express.so",
+            ]  # noqa
+            shared_libs = map(
+                lambda so_lib: "./mnn/benchmark/build_{}/{}".format(
+                    32 if "v7" in platform else 64, so_lib
+                ),
+                shared_libs,
             )
+            shared_libs = list(shared_libs)
+            config[platform]["shared_lib"] = shared_libs
             config[platform][
                 "benchmark_bin"
-            ] = "./tnn/scripts/build{}/test/TNNTest".format(
+            ] = "./mnn/benchmark/build_{}/benchmark.out".format(
                 32 if "v7" in platform else 64
             )
-        config["support_backend"] = ["ARM", "OPENCL"]
+
+        # 0->CPU，1->Metal，3->OpenCL，6->OpenGL，7->Vulkan
+        def support_backend_id(backend="0"):
+            backend_dict = {
+                "0": "ARM",
+                "ARM": "0",
+                "3": "OPENCL",
+                "OPENCL": "3",
+                "6": "OPENGL",
+                "OPENGL": "6",
+                "7": "VULKAN",
+                "VULKAN": "7",
+            }
+            return backend_dict[backend]
+
+        config["support_backend_id"] = support_backend_id
+        # 0->CPU，1->Metal，3->OpenCL，6->OpenGL，7->Vulkan
+        config["support_backend"] = ["0", "3", "6", "7"]
         config["is_cpu_backend"] = (
-            lambda b: b.upper() == "CPU" or b.upper() == "ARM"
+            lambda b: str(b).upper() == "ARM" or str(b).upper() == "0"
         )  # noqa
         config["cpu_thread_num"] = [1, 2, 4]
         # power_mode: "big_cores" # "little_cores", "no_bind"
-        config["power_mode"] = "big_cores"
+        config["power_mode"] = "big_cores"  # default is big_cores
         config["bench_cmd_pattern"] = (
-            'adb -s {serial_num} shell "export LD_LIBRARY_PATH={device_work_dir}; {'  # noqa
-            "device_benchmark_bin} -mt {model_type} -mp {model_dir} -dt {backend} -ic {"  # noqa
-            'repeats} -wc {warmup} -th {thread_num} -dl {bind_cpu_idx}" '
+            "adb -s {serial_num} shell "
+            '"export LD_LIBRARY_PATH={device_work_dir};'
+            "{device_benchmark_bin} {model_dir} {repeats} {warmup} "
+            '{forwardtype} {thread_num}"'  # {precision}"'
         )
     else:
         logger.info("Unsupported framework_name: {}".format(framework_name))

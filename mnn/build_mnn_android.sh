@@ -43,21 +43,61 @@ function download_repo {
     fi
 }
 
-# compile tnn
+# shellcheck disable=SC2120
 function build {
     cp MNNV2Basic.cpp ./mnn/tools/cpp/MNNV2Basic.cpp
+    cp benchmark.cpp ./mnn/benchmark/benchmark.cpp
     cd mnn
 
     # generate
     cd schema && ./generate.sh
     cd -
 
-    # build
     export ANDROID_NDK=${ANDROID_NDK_HOME}
-    cd project/android
-    mkdir build_32 && cd build_32 && ../build_32.sh
+    cd ./benchmark
+
+    # build 32
+    mkdir build_32
+    cd build_32
+    cmake ../../ \
+          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_ABI="armeabi-v7a" \
+          -DANDROID_STL=c++_static \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_NATIVE_API_LEVEL=android-21  \
+          -DANDROID_TOOLCHAIN=clang \
+          -DMNN_VULKAN=true \
+          -DMNN_OPENCL=true \
+          -DMNN_OPENMP=true \
+          -DMNN_OPENGL=true \
+          -DMNN_DEBUG=false \
+          -DMNN_BUILD_BENCHMARK=true \
+          -DMNN_BUILD_FOR_ANDROID_COMMAND=true \
+          -DNATIVE_LIBRARY_OUTPUT=.
+    make -j8 benchmark.out timeProfile.out
+
     cd -
-    mkdir build_64 && cd build_64 && ../build_64.sh
+    mkdir build_64
+    cd build_64
+    # build 64
+    cmake ../../ \
+          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_ABI="arm64-v8a" \
+          -DANDROID_STL=c++_static \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_NATIVE_API_LEVEL=android-21  \
+          -DANDROID_TOOLCHAIN=clang \
+          -DMNN_VULKAN=true \
+          -DMNN_OPENCL=true \
+          -DMNN_OPENMP=true \
+          -DMNN_OPENGL=true \
+          -DMNN_DEBUG=false \
+          -DMNN_BUILD_BENCHMARK=true \
+          -DMNN_BUILD_FOR_ANDROID_COMMAND=true \
+          -DNATIVE_LIBRARY_OUTPUT=.
+    make -j8 benchmark.out timeProfile.out
 }
 
 function main {

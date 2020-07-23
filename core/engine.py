@@ -22,9 +22,13 @@ from utils.misc import pattern_match, get_file_name  # noqa
 
 class Engine:
     def __init__(self, config_dict):
+        self.root_dir = os.getcwd()
         os.chdir(config_dict["work_dir"])
         self.config = config_dict
         self.prepare_engine()
+
+    def __del__(self):
+        os.chdir(self.root_dir)
 
     def engine_name(self):
         return self.config["framework_name"]
@@ -649,9 +653,7 @@ class Engine:
                         record_dict["soc"],
                         record_dict["product"],
                         record_dict["power_mode"],
-                        self.config["support_backend_id"](
-                            record_dict["backend"]
-                        ),  # noqa
+                        record_dict["backend"],
                         record_dict["cpu_thread_num"],
                         record_dict["avg"],
                         record_dict["max"],
@@ -672,9 +674,7 @@ class Engine:
                         record_dict["soc"],
                         record_dict["product"],
                         record_dict["power_mode"],
-                        self.config["support_backend_id"](
-                            record_dict["backend"]
-                        ),  # noqa
+                        record_dict["backend"],
                         record_dict["cpu_thread_num"],
                         record_dict["avg"],
                         record_dict["max"],

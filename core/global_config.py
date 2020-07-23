@@ -9,12 +9,15 @@ from utils.log import LoggerCreator  # noqa
 log_enable_debug = True
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
+GPU_REPEATS = 2
+CPU_REPEATS = 2
+WARMUP = 2
 
 
 def create_config(framework_name):
     benchmark_platform = ["android-armv7", "android-armv8"]
     config = dict()
-    config["warmup"] = 20
+    config["warmup"] = WARMUP
     if framework_name == "tnn":
         # note(ysh329):
         # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
@@ -22,9 +25,9 @@ def create_config(framework_name):
 
         def backend_to_repeats(backend):
             if backend == "OPENCL":
-                return 1000
+                return GPU_REPEATS
             else:
-                return 100
+                return CPU_REPEATS
 
         config["repeats"] = backend_to_repeats
         config[
@@ -78,9 +81,9 @@ def create_config(framework_name):
 
         def backend_to_repeats(backend):
             if backend == "VULKAN":
-                return 1000
+                return GPU_REPEATS
             else:
-                return 100
+                return CPU_REPEATS
 
         config["repeats"] = backend_to_repeats
         config[
@@ -165,9 +168,9 @@ def create_config(framework_name):
                 or backend == "VULKAN"
                 or backend == "7"
             ):
-                return 1000
+                return GPU_REPEATS
             else:
-                return 100
+                return CPU_REPEATS
 
         config["repeats"] = backend_to_repeats
         config[

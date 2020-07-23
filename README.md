@@ -28,6 +28,12 @@ cd -
 
 # bench
 python bench.py
+
+# benchmark result below
+# ./tnn/<bench-result.csv>
+# ./mnn/<bench-result.csv>
+# ./ncnn/<bench-result.csv>
+
 ```
 
 目前支持模型有限，见：[tnn-models](https://github.com/AI-performance/tnn-models)、[mnn-models](https://github.com/AI-performance/mnn-models)、[ncnn-models](https://github.com/AI-performance/ncnn-models)

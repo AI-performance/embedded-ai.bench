@@ -36,7 +36,13 @@ python bench.py
 
 ```
 
-目前支持模型有限，见：[tnn-models](https://github.com/AI-performance/tnn-models)、[mnn-models](https://github.com/AI-performance/mnn-models)、[ncnn-models](https://github.com/AI-performance/ncnn-models)
+目前支持模型有限，见：[tnn-models](https://github.com/AI-performance/tnn-models)、[mnn-models](https://github.com/AI-performance/mnn-models)、[ncnn-models](https://github.com/AI-performance/ncnn-models)。
+
+## bench结果示例
+
+- [mnn bench result demo](https://github.com/AI-performance/embedded-ai.bench/blob/master/docs/bench-demo/mnn-(HEAD%20detached%20at%201.0.0)-0df31a8-android-armv7android-armv8-20200723-221707.bench.csv)
+- [ncnn bench result demo](https://github.com/AI-performance/embedded-ai.bench/blob/master/docs/bench-demo/ncnn-master-66c8c7e-android-armv7android-armv8-20200723-221633.bench.csv)
+- [tnn bench result demo](https://github.com/AI-performance/embedded-ai.bench/blob/master/docs/bench-demo/tnn-master-2aa6b9f-android-armv7android-armv8-20200723-215922.bench.csv)
 
 
 ## 项目架构

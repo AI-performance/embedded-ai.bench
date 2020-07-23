@@ -8,6 +8,28 @@
 - 一键转换：拉取原始模型、编译转换工具、转换模型；
 - 一键测速：拉取框架模型，测速。拉取框架模型，框架模型存放于不同的代码仓库中，执行测速过程会自动完成拉取。
 
+## 跑起来
+
+```shell
+# tnn
+cd ./tnn
+./build_tnn_android.sh
+cd -
+
+# mnn
+cd ./mnn
+./build_mnn_android.sh
+cd -
+
+# ncnn
+cd ./ncnn
+./build_ncnn_android.sh
+cd -
+
+# bench
+python bench.py
+```
+
 
 ## 项目架构
 

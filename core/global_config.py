@@ -18,6 +18,9 @@ def create_config(framework_name):
     benchmark_platform = ["android-armv7", "android-armv8"]
     config = dict()
     config["warmup"] = WARMUP
+    #############################
+    # TNN config
+    #############################
     if framework_name == "tnn":
         # note(ysh329):
         # https://github.com/Tencent/TNN/blob/master/doc/cn/user/test.md
@@ -26,8 +29,11 @@ def create_config(framework_name):
         def backend_to_repeats(backend):
             if backend == "OPENCL":
                 return GPU_REPEATS
-            else:
+            elif backend == "ARM":
                 return CPU_REPEATS
+            else:
+                logger.fatal("Unsupported backend {}".format(backend))
+                exit(1)
 
         config["repeats"] = backend_to_repeats
         config[
@@ -62,6 +68,16 @@ def create_config(framework_name):
             ] = "./tnn/scripts/build{}/test/TNNTest".format(
                 32 if "v7" in platform else 64
             )
+
+        def support_backend_id(backend="ARM"):
+            backend = str(backend)
+            backend_dict = {
+                "ARM": "ARM",
+                "OPENCL": "GPU_OPENCL",
+            }
+            return backend_dict[backend]
+
+        config["support_backend_id"] = support_backend_id
         config["support_backend"] = ["ARM", "OPENCL"]
         config["is_cpu_backend"] = (
             lambda b: b.upper() == "CPU" or b.upper() == "ARM"
@@ -74,13 +90,16 @@ def create_config(framework_name):
             "device_benchmark_bin} -mt {model_type} -mp {model_dir} -dt {backend} -ic {"  # noqa
             'repeats} -wc {warmup} -th {thread_num} -dl {bind_cpu_idx}" '
         )
+    #############################
+    # NCNN config
+    #############################
     elif framework_name == "ncnn":
         # note(ysh329):
         # https://github.com/Tencent/ncnn/tree/master/benchmark/README.md
         config["work_dir"] = "./{}".format(framework_name)
 
         def backend_to_repeats(backend):
-            if backend == "VULKAN":
+            if backend == "GPU_VULKAN":
                 return GPU_REPEATS
             else:
                 return CPU_REPEATS
@@ -121,13 +140,13 @@ def create_config(framework_name):
             backend_dict = {
                 "-1": "ARM",
                 "ARM": "-1",  # noqa
-                "0": "VULKAN",
-                "VULKAN": "0",
+                "0": "GPU_VULKAN",
+                "GPU_VULKAN": "0",
             }
             return backend_dict[backend]
 
-        config["support_backned_id"] = support_backend_id
-        config["support_backends"] = ["ARM", "VULKAN"]
+        config["support_backend_id"] = support_backend_id
+        config["support_backends"] = ["ARM", "GPU_VULKAN"]
         config["is_cpu_backend"] = lambda backend_id: str(backend_id) == "-1"
         config["support_backend"] = list(
             map(support_backend_id, config["support_backends"])
@@ -153,6 +172,9 @@ def create_config(framework_name):
             "adb -s {serial_num} shell {device_benchmark_bin} {model_dir}"
             " {repeats} {warmup} {thread_num} {power_mode} {gpu_device}"
         )
+    #############################
+    # MNN config
+    #############################
     elif framework_name == "mnn":
         # note(ysh329): https://www.yuque.com/mnn/cn/tool_benchmark
         config["work_dir"] = "./{}".format(framework_name)
@@ -161,11 +183,11 @@ def create_config(framework_name):
         def backend_to_repeats(backend):
             backend = str(backend)
             if (
-                backend == "OPENCL"
+                backend == "GPU_OPENCL"
                 or backend == "3"
-                or backend == "OPENGL"
+                or backend == "GPU_OPENGL"
                 or backend == "6"
-                or backend == "VULKAN"
+                or backend == "GPU_VULKAN"
                 or backend == "7"
             ):
                 return GPU_REPEATS
@@ -221,12 +243,12 @@ def create_config(framework_name):
             backend_dict = {
                 "0": "ARM",
                 "ARM": "0",
-                "3": "OPENCL",
-                "OPENCL": "3",
-                "6": "OPENGL",
-                "OPENGL": "6",
-                "7": "VULKAN",
-                "VULKAN": "7",
+                "3": "GPU_OPENCL",
+                "GPU_OPENCL": "3",
+                "6": "GPU_OPENGL",
+                "GPU_OPENGL": "6",
+                "7": "GPU_VULKAN",
+                "GPU_VULKAN": "7",
             }
             return backend_dict[backend]
 

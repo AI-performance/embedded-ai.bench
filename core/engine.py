@@ -400,35 +400,43 @@ class Engine:
             logger.debug(
                 "didx:{}, serial_num:{}".format(didx, device_serial_num)  # noqa
             )
-            for midx in range(len(model_names)):
-                model_name = model_names[midx]
-                model_dir = "/".join(
-                    [device_work_dir, os.path.basename(model_dict[model_name])]  # noqa
+            bench_dict[device_serial_num] = dict()
+            for pidx in range(len(benchmark_platform)):
+                platform = benchmark_platform[pidx]
+                device_work_dir_platform = device_work_dir + "/" + platform  # noqa
+                device_benchmark_bin = "/".join(
+                    [
+                        device_work_dir_platform,
+                        os.path.basename(
+                            self.config[platform]["benchmark_bin"]
+                        ),  # noqa
+                    ]
                 )
-                logger.debug(
-                    "midx:{}, model_name:{}, model_dir:{}".format(
-                        midx, model_name, model_dir
-                    )
-                )
-                bench_dict[model_name] = []
-                for pidx in range(len(benchmark_platform)):
-                    platform = benchmark_platform[pidx]
-                    device_work_dir_platform = device_work_dir + "/" + platform  # noqa
-                    device_benchmark_bin = "/".join(
+                bench_dict[device_serial_num][platform] = dict()
+                logger.debug("pidx:{}, platform:{}".format(pidx, platform))
+                for midx in range(len(model_names)):
+                    model_name = model_names[midx]
+                    model_dir = "/".join(
                         [
-                            device_work_dir_platform,
-                            os.path.basename(
-                                self.config[platform]["benchmark_bin"]
-                            ),  # noqa
-                        ]
+                            device_work_dir,
+                            os.path.basename(model_dict[model_name]),
+                        ]  # noqa
                     )
-                    logger.debug("pidx:{}, platform:{}".format(pidx, platform))
+                    logger.debug(
+                        "midx:{}, model_name:{}, model_dir:{}".format(
+                            midx, model_name, model_dir
+                        )
+                    )
+                    bench_dict[device_serial_num][platform][model_name] = dict()  # noqa
                     for bidx in range(len(support_backend)):
                         backend = support_backend[bidx]
                         is_cpu = self.config["is_cpu_backend"]
                         logger.debug(
                             "bidx:{}, backend:{}".format(bidx, backend)
                         )  # noqa
+                        bench_dict[device_serial_num][platform][model_name][
+                            backend
+                        ] = dict()  # noqa
                         for tidx in range(
                             len(self.config["cpu_thread_num"])
                             if is_cpu(backend)
@@ -441,6 +449,14 @@ class Engine:
                                 )  # noqa
                             )
                             cpu_thread_num = self.config["cpu_thread_num"][tidx]  # noqa
+                            bench_dict[device_serial_num][platform][model_name][  # noqa
+                                backend
+                            ][
+                                cpu_thread_num
+                            ] = dict()  # noqa
+                            #######################
+                            # bench start
+                            #######################
                             if self.config["framework_name"] == "tnn":
                                 bench_cmd = bench_cmd_pattern.format(
                                     **{
@@ -507,11 +523,13 @@ class Engine:
                                 )
                                 exit(1)
 
-                            cmd_handle = run_cmd(
+                            cmd_res = run_cmd(
                                 bench_cmd, wait_interval_sec=3  # noqa
                             )  # noqa
-                            perf_dict = self.parse_benchmark(cmd_handle)
+                            perf_dict = self.parse_benchmark(cmd_res)
+                            #################################
                             # summarize benchmark info
+                            #################################
                             bench_record = {
                                 "soc": device_dict[device_serial_num]["soc"],
                                 "product": device_dict[device_serial_num][  # noqa
@@ -545,7 +563,12 @@ class Engine:
                                 "cmd": bench_cmd,
                                 "imei": device_dict[device_serial_num]["imei"],
                             }
-                            bench_dict[model_name].append(bench_record)
+                            bench_dict[device_serial_num][platform][model_name][  # noqa
+                                backend
+                            ][
+                                cpu_thread_num
+                            ] = bench_record  # noqa
+                            # bench_dict[model_name].append(bench_record)
                             logger.info(bench_record)
         return bench_dict
 
@@ -633,93 +656,62 @@ class Engine:
         summary_header_str = ",".join(summary_header)
         summary = [summary_header_str]
 
-        model_names = list(bench_dict.keys())
-        model_names.sort()
-        model_num = len(model_names)
-        for midx in range(model_num):
-            model_name = model_names[midx]
-            bench_records = bench_dict[model_name]
-            logger.info("midx:{}/{},{}".format(midx + 1, model_num, model_name))  # noqa
-            for ridx in range(len(bench_records)):
-                record_dict = bench_records[ridx]
-                logger.info(record_dict)
-                if self.config["framework_name"] == "tnn":
-                    record = [
-                        self.config["framework_name"],
-                        self.config["framework_repo_branch"],
-                        self.config["framework_repo_commit_id"],
-                        record_dict["model_name"],
-                        record_dict["platform"],
-                        record_dict["soc"],
-                        record_dict["product"],
-                        record_dict["power_mode"],
-                        record_dict["backend"],
-                        record_dict["cpu_thread_num"],
-                        record_dict["avg"],
-                        record_dict["max"],
-                        record_dict["min"],
-                        record_dict["battery_level"],
-                        record_dict["system_version"],
-                        record_dict["repeats"],
-                        record_dict["warmup"],
-                        record_dict["imei"],
-                    ]
-                elif self.config["framework_name"] == "ncnn":
-                    record = [
-                        self.config["framework_name"],
-                        self.config["framework_repo_branch"],
-                        self.config["framework_repo_commit_id"],
-                        record_dict["model_name"],
-                        record_dict["platform"],
-                        record_dict["soc"],
-                        record_dict["product"],
-                        record_dict["power_mode"],
-                        record_dict["backend"],
-                        record_dict["cpu_thread_num"],
-                        record_dict["avg"],
-                        record_dict["max"],
-                        record_dict["min"],
-                        record_dict["battery_level"],
-                        record_dict["system_version"],
-                        record_dict["repeats"],
-                        record_dict["warmup"],
-                        record_dict["imei"],
-                    ]
-                elif self.config["framework_name"] == "mnn":
-                    record = [
-                        self.config["framework_name"],
-                        self.config["framework_repo_branch"],
-                        self.config["framework_repo_commit_id"],
-                        record_dict["model_name"],
-                        record_dict["platform"],
-                        record_dict["soc"],
-                        record_dict["product"],
-                        record_dict["power_mode"],
-                        self.config["support_backend_id"](
-                            record_dict["backend"]
-                        ),  # noqa
-                        record_dict["cpu_thread_num"],
-                        record_dict["avg"],
-                        record_dict["max"],
-                        record_dict["min"],
-                        record_dict["battery_level"],
-                        record_dict["system_version"],
-                        record_dict["repeats"],
-                        record_dict["warmup"],
-                        record_dict["imei"],
-                    ]
-                else:
-                    logger.fatal(
-                        "Unsupported framework name:{}".format(
-                            self.config["framework_name"]
-                        )
-                    )
-                    exit(1)
-                record_str = ",".join(map(str, record))
-                if True:
-                    logger.info(record_str)
-                summary.append(record_str)
-
+        # bench_dict[device_serial_num][platform][model_name][support_backend][cpu_thread_num] = bench_record  # noqa
+        device_serials = list(bench_dict.keys())
+        for didx in range(len(device_serials)):
+            serial = device_serials[didx]
+            platforms = list(bench_dict[serial].keys())
+            for pidx in range(len(platforms)):
+                platform = platforms[pidx]
+                model_names = list(bench_dict[serial][platform].keys())
+                for midx in range(len(model_names)):
+                    model_name = model_names[midx]
+                    backends = list(
+                        bench_dict[serial][platform][model_name].keys()
+                    )  # noqa
+                    for bidx in range(len(backends)):
+                        backend = backends[bidx]
+                        cpu_thread_nums = list(
+                            bench_dict[serial][platform][model_name][
+                                backend
+                            ].keys()  # noqa
+                        )  # noqa
+                        for tidx in range(len(cpu_thread_nums)):
+                            cpu_thread_num = cpu_thread_nums[tidx]
+                            # get record
+                            record_dict = bench_dict[serial][platform][
+                                model_name
+                            ][  # noqa
+                                backend
+                            ][
+                                cpu_thread_num
+                            ]  # noqa
+                            record = [
+                                self.config["framework_name"],
+                                self.config["framework_repo_branch"],
+                                self.config["framework_repo_commit_id"],
+                                record_dict["model_name"],
+                                record_dict["platform"],
+                                record_dict["soc"],
+                                record_dict["product"],
+                                record_dict["power_mode"],
+                                self.config["support_backend_id"](
+                                    record_dict["backend"]
+                                ),  # noqa
+                                record_dict["cpu_thread_num"],
+                                record_dict["avg"],
+                                record_dict["max"],
+                                record_dict["min"],
+                                record_dict["battery_level"],
+                                record_dict["system_version"],
+                                record_dict["repeats"],
+                                record_dict["warmup"],
+                                record_dict["imei"],
+                            ]
+                            record_str = ",".join(map(str, record))
+                            if True:
+                                logger.info(record_str)
+                            summary.append(record_str)
         if is_print_summary:
             summary_str = "\n".join(summary)
             logger.info("\n" + summary_str)

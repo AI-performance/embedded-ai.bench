@@ -29,6 +29,10 @@ cd -
 # bench
 python bench.py
 
+# if execution is okay:
+# ===> edit ./core/global_config.py
+# ===> edit value of `GPU_REPEATS=1000`, `CPU_REPEATS=100`, `WARMUP=20`
+
 # see benchmark result below
 # ./tnn/*.csv
 # ./mnn/*.csv

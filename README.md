@@ -29,10 +29,10 @@ cd -
 # bench
 python bench.py
 
-# benchmark result below
-# ./tnn/<bench-result.csv>
-# ./mnn/<bench-result.csv>
-# ./ncnn/<bench-result.csv>
+# see benchmark result below
+# ./tnn/*.csv
+# ./mnn/*.csv
+# ./ncnn/*.csv
 
 ```
 

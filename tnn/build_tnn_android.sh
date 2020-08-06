@@ -44,6 +44,7 @@ function download_repo {
 
 # compile tnn
 function build {
+   cp timer.* ./tnn/test/
    cd tnn/scripts/
    ./build_android.sh
 }

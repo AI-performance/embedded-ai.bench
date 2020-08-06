@@ -543,6 +543,7 @@ class Engine:
                                 "avg": perf_dict["avg"],
                                 "max": perf_dict["max"],
                                 "min": perf_dict["min"],
+                                "std_dev": perf_dict["std_dev"],
                                 "backend": backend,
                                 "cpu_thread_num": cpu_thread_num,
                                 "power_mode": self.config["power_mode"],
@@ -595,6 +596,7 @@ class Engine:
             benchmark["min"] = pattern_match(line, "min=", "ms", False)
             benchmark["max"] = pattern_match(line, "max=", "ms", False)
             benchmark["avg"] = pattern_match(line, "avg=", "ms", False)
+            benchmark["std_dev"] = pattern_match(line, "std_dev=", "ms", False)
         elif framework_name == "ncnn":
             is_no_vulkan = list(
                 filter(lambda line: "no vulkan device" in line, output_lines)
@@ -604,6 +606,7 @@ class Engine:
                 benchmark["min"] = 0.0
                 benchmark["max"] = 0.0
                 benchmark["avg"] = 0.0
+                benchmark["std_dev"] = 0.0
             else:
                 output_lines = filter(
                     lambda line: "min = " in line, output_lines
@@ -617,7 +620,10 @@ class Engine:
                 line = "".join(line) + "END"
                 benchmark["min"] = pattern_match(line, "min=", "max", False)
                 benchmark["max"] = pattern_match(line, "max=", "avg", False)
-                benchmark["avg"] = pattern_match(line, "avg=", "END", False)
+                benchmark["avg"] = pattern_match(line, "avg=", "std_dev", False)  # noqa
+                benchmark["std_dev"] = pattern_match(
+                    line, "std_dev=", "END", False
+                )  # noqa
         else:
             logger.fatal(
                 "Unsupported framework {}".format(  # noqa
@@ -647,6 +653,7 @@ class Engine:
             "avg",
             "max",
             "min",
+            "std_dev",
             "battery_level",
             "system_version",
             "repeats",
@@ -702,6 +709,7 @@ class Engine:
                                 record_dict["avg"],
                                 record_dict["max"],
                                 record_dict["min"],
+                                record_dict["std_dev"],
                                 record_dict["battery_level"],
                                 record_dict["system_version"],
                                 record_dict["repeats"],
@@ -784,7 +792,7 @@ class TestEngine(unittest.TestCase):
         tnn.set_config("benchmark_platform", ["android-armv8"])
         tnn.set_config("support_backend", ["ARM"])
         tnn.set_config("cpu_thread_num", [2])
-        tnn.config["repeats"] = 5
+        tnn.config["repeats"] = lambda backend: 10 if backend == "ARM" else 20
         tnn.config["warmup"] = 2
         model_dict = tnn.prepare_models()
         device_dict = tnn.prepare_devices()
@@ -803,7 +811,7 @@ class TestEngine(unittest.TestCase):
         summary_str = "\n".join(summary_list)
         logger.info("summary_str:\n{}".format(summary_str))
         return 0
-    #"""
+    """
 
     """
     def test_ncnn_engine(self):
@@ -818,9 +826,9 @@ class TestEngine(unittest.TestCase):
             "benchmark_platform", ["android-armv8", "android-armv7"]  # noqa
         )
         ncnn.set_config("support_backend", ["0"])  # -1: cpu, 0: gpu # noqa
-        ncnn.set_config("cpu_thread_num", [1, 2, 4])
+        ncnn.set_config("cpu_thread_num", [1])  # 1, 2, 4
         ncnn.config["repeats"] = (
-            lambda backend: 100 if backend == "VULKAN" else 1000
+            lambda backend: 20 if backend == "VULKAN" else 10
         )  # noqa
         ncnn.config["warmup"] = 2
         model_dict = ncnn.prepare_models()
@@ -844,6 +852,7 @@ class TestEngine(unittest.TestCase):
         return 0
     """
 
+    # """
     def test_mnn_engine(self):
         from core.global_config import create_config
 
@@ -857,7 +866,7 @@ class TestEngine(unittest.TestCase):
         mnn.set_config(
             "support_backend", ["3", "6", "7"]
         )  # 0->CPU，1->Metal，3->OpenCL，6->OpenGL，7->Vulkan
-        mnn.set_config("cpu_thread_num", [1, 2, 4])
+        mnn.set_config("cpu_thread_num", [1, 2, 4])  # [1, 2, 4]
         mnn.config["warmup"] = 2
         model_dict = mnn.prepare_models()
         device_dict = mnn.prepare_devices()
@@ -876,6 +885,8 @@ class TestEngine(unittest.TestCase):
         logger.info("summary_str:\n{}".format(summary_str))
         mnn.write_list_to_file(summary_list)
         return 0
+
+    # """
 
 
 if __name__ == "__main__":

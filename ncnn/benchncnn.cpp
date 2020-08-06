@@ -15,6 +15,7 @@
 #include <float.h>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 #ifdef _WIN32
 #include <algorithm>
@@ -115,6 +116,9 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
     double time_min = DBL_MAX;
     double time_max = -DBL_MAX;
     double time_avg = 0;
+    double time_std_dev = -1;
+    std::vector<double> times;
+
 
     for (int i = 0; i < g_loop_count; i++)
     {
@@ -126,6 +130,7 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
         }
         double end = ncnn::get_current_time();
         double time = end - start;
+        times.emplace_back(time);
 
         time_min = std::min(time_min, time);
         time_max = std::max(time_max, time);
@@ -133,8 +138,12 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
     }
 
     time_avg /= g_loop_count;
+    for (size_t i = 0; i < times.size(); ++i) {
+        time_std_dev += pow((times[i] - time_avg), 2);
+    }
+    time_std_dev = sqrt(time_std_dev / times.size());
 
-    fprintf(stdout, "%20s  min = %7.2f  max = %7.2f  avg = %7.2f\n", comment, time_min, time_max, time_avg);
+    fprintf(stdout, "%20s  min = %7.2f  max = %7.2f  avg = %7.2f  std_dev = %7.2f\n", comment, time_min, time_max, time_avg, time_std_dev);
 }
 
 int main(int argc, char** argv)

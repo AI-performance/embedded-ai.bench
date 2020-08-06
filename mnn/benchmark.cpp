@@ -176,14 +176,18 @@ std::vector<float> doBench(Model& model, int loop, int warmup = 10, int forward 
 }
 
 void displayStats(const std::string& name, const std::vector<float>& costs) {
-    float max = 0, min = FLT_MAX, sum = 0, avg;
+    float max = 0, min = FLT_MAX, sum = 0, avg, std_dev = 0;
     for (auto v : costs) {
         max = fmax(max, v);
         min = fmin(min, v);
         sum += v;
     }
     avg = costs.size() > 0 ? sum / costs.size() : 0;
-    printf("[ - ] %-24s    max = %8.3fms  min = %8.3fms  avg = %8.3fms\n", name.c_str(), max, avg == 0 ? 0 : min, avg);
+    for (size_t i = 0; i < costs.size(); ++i) {
+        std_dev += pow(costs[i] - avg, 2);
+    }
+    std_dev = sqrt(std_dev / costs.size());
+    printf("[ - ] %-24s    max = %8.3fms  min = %8.3fms  avg = %8.3fms  std_dev = %8.3fms\n", name.c_str(), max, avg == 0 ? 0 : min, avg, std_dev);
 }
 static inline std::string forwardType(MNNForwardType type) {
     switch (type) {

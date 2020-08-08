@@ -9,9 +9,9 @@ from utils.log import LoggerCreator  # noqa
 log_enable_debug = True
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
-GPU_REPEATS = 2
-CPU_REPEATS = 2
-WARMUP = 2
+GPU_REPEATS = 2  # 1000
+CPU_REPEATS = 1  # 100
+WARMUP = 0  # 20
 
 
 def create_config(framework_name):
@@ -99,7 +99,10 @@ def create_config(framework_name):
         config["work_dir"] = "./{}".format(framework_name)
 
         def backend_to_repeats(backend):
-            if backend == "GPU_VULKAN":
+            backend = str(backend)
+            if "ARM" in backend or "-1" in backend:
+                return CPU_REPEATS
+            elif "GPU" in backend or "0" in backend:
                 return GPU_REPEATS
             else:
                 return CPU_REPEATS
@@ -146,7 +149,7 @@ def create_config(framework_name):
             return backend_dict[backend]
 
         config["support_backend_id"] = support_backend_id
-        config["support_backends"] = ["ARM", "GPU_VULKAN"]
+        config["support_backends"] = ["ARM", "GPU_VULKAN"]  # only used below
         config["is_cpu_backend"] = lambda backend_id: str(backend_id) == "-1"
         config["support_backend"] = list(
             map(support_backend_id, config["support_backends"])

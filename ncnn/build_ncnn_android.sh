@@ -74,6 +74,7 @@ cd ncnn
 #    popd
 
 ##### android armv7 vulkan
+git submodule update --init
 mkdir -p build-android-armv7-vulkan
 pushd build-android-armv7-vulkan
 cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-24 -DNCNN_VULKAN=ON ..
@@ -82,6 +83,7 @@ make install
 popd
 
 ##### android aarch64 vulkan
+git submodule update --init
 mkdir -p build-android-aarch64-vulkan
 pushd build-android-aarch64-vulkan
 cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-24 -DNCNN_VULKAN=ON ..

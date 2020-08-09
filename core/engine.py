@@ -7,7 +7,11 @@ import time
 import unittest
 
 sys.path.append("..")  # noqa
-from core.global_config import logger  # noqa
+from core.global_config import (  # noqa
+    logger,
+    MAX_TIMEOUT_SECOND,
+    MAX_TIMEOUT_SECOND_ONCE_INFER,
+)  # noqa
 from utils.device import (  # noqa
     get_adb_devices,
     get_target_freq_idx,
@@ -522,9 +526,20 @@ class Engine:
                                     )
                                 )
                                 exit(1)
-
+                            #################################
+                            # run benchmark
+                            #################################
+                            run_times_sum = (
+                                self.config["repeats"](backend)
+                                + self.config["warmup"]  # noqa
+                            )  # noqa
+                            max_wait_sec = (
+                                MAX_TIMEOUT_SECOND_ONCE_INFER * run_times_sum
+                            )  # noqa
                             cmd_res = run_cmd(
-                                bench_cmd, wait_interval_sec=3  # noqa
+                                bench_cmd,
+                                wait_interval_sec=3,
+                                max_timeout_sec=max_wait_sec,
                             )  # noqa
                             perf_dict = self.parse_benchmark(cmd_res)
                             #################################

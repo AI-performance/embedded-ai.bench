@@ -9,9 +9,11 @@ from utils.log import LoggerCreator  # noqa
 log_enable_debug = True
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
-GPU_REPEATS = 2  # 1000
-CPU_REPEATS = 1  # 100
-WARMUP = 0  # 20
+GPU_REPEATS = 1000  # 1000
+CPU_REPEATS = 100  # 100
+WARMUP = 20  # 20
+MAX_TIMEOUT_SECOND = 250
+MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5
 
 
 def create_config(framework_name):

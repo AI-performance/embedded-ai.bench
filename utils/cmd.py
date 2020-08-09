@@ -8,10 +8,10 @@ import subprocess
 import unittest
 
 sys.path.append("..")
-from core.global_config import logger, MAX_TIMEOUT_SECOND  # noqa
+from core.global_config import logger  # noqa
 
 
-def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=MAX_TIMEOUT_SECOND):
+def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=100):
     cmd_type = "CMD"
     logger.info("{}> {}".format(cmd_type, cmd))
     subp = subprocess.Popen(

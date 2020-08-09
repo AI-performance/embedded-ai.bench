@@ -10,7 +10,7 @@ from utils.cmd import run_cmd, run_cmds  # noqa
 from utils.misc import pattern_match  # noqa
 
 
-def get_soc_from_name(name):
+def get_soc_info_from_name(name):
     # summ.: http://www.mydrivers.com/zhuanti/tianti/01/index.html
     # snapdragon
     soc_dict = {  # noqa
@@ -249,6 +249,27 @@ def get_system_version(serial_num):
     return sys_ver
 
 
+def get_soc_code(serial_num):
+    lookup_soc_code_cmd = (
+        "adb -s {} shell getprop | "  # noqa
+        "grep 'ro.board.platform'".format(serial_num)  # noqa
+    )
+    soc_code = run_cmd(lookup_soc_code_cmd)[0]
+    soc_code = soc_code.split(": ")[1].strip().replace("[", "").replace("]", "")  # noqa
+    logger.debug(soc_code)
+    return soc_code
+
+
+def get_product(serial_num):
+    lookup_product_cmd = "adb -s {} shell getprop | grep 'ro.product.model'".format(  # noqa
+        serial_num  # noqa
+    )  # noqa
+    product = run_cmd(lookup_product_cmd)[0]
+    product = product.split(": ")[1].strip().replace("[", "").replace("]", "")  # noqa
+    logger.debug(product)
+    return product
+
+
 def get_imei(serial_num):
     lookup_imei_cmd = "adb -s {} shell service call iphonesubinfo 1".format(  # noqa
         serial_num
@@ -306,6 +327,9 @@ class TestDevice(unittest.TestCase):
             battery_level = get_battery_level(ser)
             system_version = get_system_version(ser)
             imei = get_imei(ser)
+            soc_code = get_soc_code(ser)
+            product = get_product(ser)
+            soc_dict = get_soc_info_from_name(soc_code)
 
             logger.info("sidx:{}, ser:{}, status:{}".format(sidx, ser, status))
             logger.info("cpus_max_freq:{}".format(cpus_max_freq))
@@ -316,6 +340,9 @@ class TestDevice(unittest.TestCase):
             logger.info("battery_level:{}".format(battery_level))
             logger.info("system_version:{}".format(system_version))
             logger.info("imei:{}".format(imei))
+            logger.info("soc_code:{}".format(soc_code))
+            logger.info("product:{}".format(product))
+            logger.info("soc_dict:{}".format(soc_dict))
 
 
 if __name__ == "__main__":

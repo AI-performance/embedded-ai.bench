@@ -19,6 +19,8 @@ from utils.device import (  # noqa
     get_battery_level,
     get_system_version,
     get_imei,
+    get_soc_code,
+    get_product,
 )  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
 from utils.misc import pattern_match, get_file_name  # noqa
@@ -214,28 +216,14 @@ class Engine:
             device_dict[device_serial_num]["imei"] = get_imei(device_serial_num)  # noqa
 
             # ro.board.platform, ro.board.chiptype, ro.board.hardware
-            device_soc_cmd = (
-                "adb -s {} shell getprop |"
-                " grep 'ro.board.platform'".format(device_serial_num)
-            )
-            cmd_handls = run_cmds([device_soc_cmd])
-            soc = cmd_handls[device_soc_cmd][0]
-            soc = soc.split(": ")[1].strip().replace("[", "").replace("]", "")  # noqa
-            device_dict[device_serial_num]["soc"] = soc
-            logger.debug(soc)
+            device_dict[device_serial_num]["soc"] = get_soc_code(
+                device_serial_num
+            )  # noqa
 
             # product
-            device_product_cmd = (
-                "adb -s {} shell getprop | "
-                "grep 'ro.product.model'".format(device_serial_num)
-            )
-            cmd_handle = run_cmd(device_product_cmd)
-            product = cmd_handle[0]
-            product = (
-                product.split(": ")[1].strip().replace("[", "").replace("]", "")  # noqa
+            device_dict[device_serial_num]["product"] = get_product(
+                device_serial_num
             )  # noqa
-            device_dict[device_serial_num]["product"] = product
-            logger.debug(product)
 
         logger.debug(device_dict)
         logger.info("len(device_dict):{}".format(len(device_dict)))
@@ -795,6 +783,9 @@ class Engine:
 
 class TestEngine(unittest.TestCase):
     def setUp(self):
+        import sys
+
+        print(sys.argv)
         logger.info(
             "{} {}".format(
                 self.__class__.__name__, sys._getframe().f_code.co_name  # noqa

@@ -67,7 +67,6 @@ function main() {
         make -j 8
         make install
         make ncnnoptimize -j4
-        make caffe2ncnn -j4
         popd
     fi
 

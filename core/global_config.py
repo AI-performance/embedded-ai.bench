@@ -41,6 +41,7 @@ def create_config(framework_name):
                 exit(1)
 
         config["repeats"] = backend_to_repeats
+        config["engine_repo"] = "https://github.com/Tencent/TNN.git"
         config[
             "model_repo"
         ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
@@ -113,6 +114,7 @@ def create_config(framework_name):
                 return CPU_REPEATS
 
         config["repeats"] = backend_to_repeats
+        config["engine_repo"] = "https://github.com/Tencent/NCNN.git"
         config[
             "model_repo"
         ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
@@ -203,6 +205,7 @@ def create_config(framework_name):
                 return CPU_REPEATS
 
         config["repeats"] = backend_to_repeats
+        config["engine_repo"] = "https://github.com/alibaba/MNN.git"
         config[
             "model_repo"
         ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
@@ -297,9 +300,12 @@ class TestGlobalConfig(unittest.TestCase):
         )
 
     def test_config(self):
-        tnn_config = create_config("tnn")
-        logger.info("tnn_config:\n{}".format(tnn_config))
-        self.assertNotEqual(tnn_config, dict())
+        framework_list = ["tnn", "mnn", "ncnn"]
+        for fidx in range(len(framework_list)):
+            framework = framework_list[fidx]
+            framework_config = create_config(framework)
+            logger.info("{}_config:\n{}".format(framework, framework_config))
+            self.assertNotEqual(framework_config, dict())
 
 
 if __name__ == "__main__":

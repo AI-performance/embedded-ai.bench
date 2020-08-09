@@ -6,7 +6,20 @@ sudo apt-get install -y android-tools-adb
 #source ~/.bashrc
 #conda init bash
 #conda activate dev_env_py
+
 PYDIR_LIST=("./core" "./utils")
+
+if [ ! -d "./mnn/mnn" ]; then
+    cd mnn && git clone https://github.com/alibaba/MNN.git mnn
+fi
+
+if [ ! -d "./tnn/tnn" ]; then
+    cd tnn && git clone https://github.com/Tencent/TNN.git tnn
+fi
+
+if [ ! -d "./ncnn/ncnn" ]; then
+    cd ncnn && git clone https://github.com/Tencent/NCNN.git ncnn
+fi
 
 # shellcheck disable=SC2068
 for py_dir in ${PYDIR_LIST[@]}; do

@@ -6,14 +6,17 @@ import unittest
 sys.path.append("..")
 from utils.log import LoggerCreator  # noqa
 
+##############################
+# Global Config
+##############################
 log_enable_debug = True
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
 GPU_REPEATS = 1000  # 1000
 CPU_REPEATS = 100  # 100
 WARMUP = 20  # 20
-MAX_TIMEOUT_SECOND = 250
-MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5
+MAX_TIMEOUT_SECOND = 10  # 10, not used for infer command
+MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5  # used to calc MAX_TIMEOUT_SECOND
 
 
 def create_config(framework_name):

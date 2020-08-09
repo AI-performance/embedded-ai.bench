@@ -8,10 +8,10 @@ import subprocess
 import unittest
 
 sys.path.append("..")
-from core.global_config import logger  # noqa
+from core.global_config import logger, MAX_TIMEOUT_SECOND  # noqa
 
 
-def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=1000):
+def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=MAX_TIMEOUT_SECOND):
     cmd_type = "CMD"
     logger.info("{}> {}".format(cmd_type, cmd))
     subp = subprocess.Popen(
@@ -21,7 +21,14 @@ def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=1000):
         stderr=subprocess.PIPE,
         encoding="utf-8",
     )
-    subp.wait(max_timeout_sec)
+
+    try:
+        subp.wait(max_timeout_sec)
+    except subprocess.TimeoutExpired:
+        logger.error(
+            "TimeoutExpired {} seconds: {}".format(max_timeout_sec, cmd)  # noqa  # noqa
+        )
+        return None
 
     subp_status = -1
     duration_sec = 0

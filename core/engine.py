@@ -579,14 +579,26 @@ class Engine:
         logger.debug(output_lines)
         framework_name = self.config["framework_name"]
         benchmark = dict()
-        if framework_name == "tnn" or framework_name == "mnn":
+        benchmark["min"] = 0.0
+        benchmark["max"] = 0.0
+        benchmark["avg"] = 0.0
+        benchmark["std_dev"] = 0.0
+        if cmd_res is None:
+            return benchmark
+        elif framework_name == "tnn" or framework_name == "mnn":
             if framework_name == "tnn":
                 bench_res_keyword = "time cost"
             elif framework_name == "mnn":
                 bench_res_keyword = "max ="
+            output_lines_str = "".join(output_lines)
             output_lines = filter(  # noqa
                 lambda line: bench_res_keyword in line, output_lines
             )
+            if (
+                framework_name == "mnn"
+                and "Floating point exception" in output_lines_str
+            ):
+                return benchmark
             output_lines = list(output_lines)
             assert len(output_lines) == 1
             line = output_lines[0].split()
@@ -599,14 +611,15 @@ class Engine:
             benchmark["std_dev"] = pattern_match(line, "std_dev=", "ms", False)
         elif framework_name == "ncnn":
             is_no_vulkan = list(
-                filter(lambda line: "no vulkan device" in line, output_lines)
+                filter(
+                    lambda line: "no vulkan device" in line
+                    or '"libvulkan.so" not found' in line,
+                    output_lines,
+                )
             )
             is_no_vulkan = len(is_no_vulkan) > 0
             if is_no_vulkan:
-                benchmark["min"] = 0.0
-                benchmark["max"] = 0.0
-                benchmark["avg"] = 0.0
-                benchmark["std_dev"] = 0.0
+                return benchmark
             else:
                 output_lines = filter(
                     lambda line: "min = " in line, output_lines
@@ -861,12 +874,11 @@ class TestEngine(unittest.TestCase):
         config_dict["work_dir"] = os.getcwd() + "/../mnn"
 
         mnn = Engine(config_dict)
-        mnn.set_config("benchmark_platform", ["android-armv8", "android-armv7"])  # noqa
-
+        mnn.set_config("benchmark_platform", ["android-armv8"])  # noqa
         mnn.set_config(
-            "support_backend", ["3", "6", "7"]
+            "support_backend", ["0"]
         )  # 0->CPU，1->Metal，3->OpenCL，6->OpenGL，7->Vulkan
-        mnn.set_config("cpu_thread_num", [1, 2, 4])  # [1, 2, 4]
+        mnn.set_config("cpu_thread_num", [4])  # [1, 2, 4]
         mnn.config["warmup"] = 2
         model_dict = mnn.prepare_models()
         device_dict = mnn.prepare_devices()

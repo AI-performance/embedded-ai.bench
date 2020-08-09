@@ -10,6 +10,132 @@ from utils.cmd import run_cmd, run_cmds  # noqa
 from utils.misc import pattern_match  # noqa
 
 
+def get_soc_from_name(name):
+    # snapdragon
+    soc_dict = {  # noqa
+        # snapdragon SoC  # noqa
+        "kona": {"name": "SD865", "cpu": "", "gpu": "", "npu": ""},  # noqa
+        "msmnile": {"name": "SD855", "cpu": "", "gpu": "", "npu": ""},  # noqa
+        "sdm845": {"name": "SD845", "cpu": "", "gpu": "", "npu": ""},  # noqa
+        "msm8998": {"name": "SD835", "cpu": "", "gpu": "", "npu": ""},  # noqa
+        "msm8916": {
+            "name": "",
+            "cpu": "4xA53@1.2",
+            "gpu": "Adreno-306",
+            "npu": "",
+        },  # noqa
+        "msm8953": {
+            "name": "SD625",
+            "cpu": "8×A53@2.0",
+            "gpu": "Adreno-506",
+            "npu": "",
+        },  # noqa
+        # kirin SoC  # noqa
+        # http://www.hisilicon.com/en/Products/ProductList/Kirin
+        "kirin710": {
+            "name": "kirin710",
+            "cpu": "4×A73@2.2+4×A53@1.7",
+            "gpu": "Mali-G51",
+            "npu": "",
+        },  # noqa
+        "kirin820": {
+            "name": "kirin820",
+            "cpu": "1xA76@2.36+3xA76@2.22+4xA55@1.84",
+            "gpu": "Mali-G57 MP6",
+            "npu": "D110@Lite",
+        },  # noqa
+        "kirin810": {
+            "name": "kirin810",
+            "cpu": "2×A76@2.27+6×A55@1.88",
+            "gpu": "Mali-G52",
+            "npu": "D100@Lite",
+        },  # noqa
+        "kirin990": {
+            "name": "kirin990",
+            "cpu": "2xA76@2.86+2xA76@2.36+4xA55@1.95",
+            "gpu": "Mali-G76 MP16",
+            "npu": "1xLite+1xTiny",
+        },  # noqa
+        "kirin985": {
+            "name": "kirin985",
+            "cpu": "1xA76@2.58+3xA76@2.4+4xA55@1.84",
+            "gpu": "Mali-G77 MP8",
+            "npu": "1xD110@Lite+1xD100@Tiny",
+        },  # noqa
+        "kirin980": {
+            "name": "kirin980",
+            "cpu": "2xA76@2.6+2xA76@1.92+4xA55@1.8",
+            "gpu": "Mali-G76 MP10",
+            "npu": "Dual NPU",
+        },  # noqa
+        "kirin970": {
+            "name": "kirin970",
+            "cpu": "4xA73+4xA53",
+            "gpu": "Mali-G72 MP12",
+            "npu": "Dedicated NPU",
+        },  # noqa
+        "kirin960": {
+            "name": "kirin960",
+            "cpu": "4xA73@2.4+4xA53@1.8",
+            "gpu": "Mali-G71 MP8",
+            "npu": "",
+        },  # noqa
+        "kirin950": {
+            "name": "kirin950",
+            "cpu": "4xA72@2.3+4xA53@1.8",
+            "gpu": "Mali-T880 MP4",
+            "npu": "",
+        },  # noqa
+        "kirin930": {
+            "name": "kirin930",
+            "cpu": "4xA53@2.2+4xA53@1.5",
+            "gpu": "Mali-628@680 MP4",
+            "npu": "",
+        },  # noqa
+        "kirin920": {
+            "name": "kirin920",
+            "cpu": "4xA15@1.7+4xA7@1.3",
+            "gpu": "Mali-T624@600 MP4",
+            "npu": "",
+        },  # noqa
+        "kirin910": {
+            "name": "kirin910",
+            "cpu": "4xA9@1.6",
+            "gpu": "Mali-450@533 MP4",
+            "npu": "",
+        },  # noqa
+        "kirin650": {
+            "name": "kirin650",
+            "cpu": "4xA53@2.0+4xA53@1.7",
+            "gpu": "Mali-T830@900",
+            "npu": "",
+        },  # noqa
+        "kirin620": {
+            "name": "kirin620",
+            "cpu": "8xA53@1.2",
+            "gpu": "Mali-450@500 MP4",
+            "npu": "",
+        },  # noqa
+        # Samsung
+        # https://www.samsung.com/semiconductor/minisite/exynos/products/all-processors/
+        "exynos5": {
+            "name": "exynos 7872",
+            "cpu": "2xA73@2.0+4xA53@1.6",
+            "gpu": "Mali-G71",
+            "npu": "",
+        },  # noqa
+    }
+    cur_soc_dict = dict()
+    if name in soc_dict.keys():
+        cur_soc_dict = soc_dict[name]
+    else:
+        cur_soc_dict["cpu"] = ""
+        cur_soc_dict["gpu"] = ""
+        cur_soc_dict["npu"] = ""
+    cur_soc_dict["code"] = name
+    return cur_soc_dict
+
+
 def get_adb_devices(is_print_status=False):
     device_dict = dict()
     adb_device_cmd = "adb devices"
@@ -164,6 +290,9 @@ class TestDevice(unittest.TestCase):
             status = device_dict[ser]
             # for each cpu's max freq
             cpus_max_freq = get_cpu_max_freqs(ser)
+            cpus_max_freq = list(
+                filter(lambda freq: freq is not None, cpus_max_freq)
+            )  # noqa
             max_freq = max(cpus_max_freq)
             min_freq = min(cpus_max_freq)
             max_freq_cluster_idx = get_target_freq_idx(

@@ -11,6 +11,7 @@ from utils.misc import pattern_match  # noqa
 
 
 def get_soc_from_name(name):
+    # summ.: http://www.mydrivers.com/zhuanti/tianti/01/index.html
     # snapdragon
     soc_dict = {  # noqa
         # snapdragon SoC  # noqa

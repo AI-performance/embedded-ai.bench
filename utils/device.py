@@ -10,26 +10,46 @@ from utils.cmd import run_cmd, run_cmds  # noqa
 from utils.misc import pattern_match  # noqa
 
 
-def get_soc_info_from_name(name):
+def get_soc_info_from_soc_code(soc_code):
     # summ.: http://www.mydrivers.com/zhuanti/tianti/01/index.html
     # snapdragon
     soc_dict = {  # noqa
         # snapdragon SoC  # noqa
-        "kona": {"name": "SD865", "cpu": "", "gpu": "", "npu": ""},  # noqa
-        "msmnile": {"name": "SD855", "cpu": "", "gpu": "", "npu": ""},  # noqa
-        "sdm845": {"name": "SD845", "cpu": "", "gpu": "", "npu": ""},  # noqa
-        "msm8998": {"name": "SD835", "cpu": "", "gpu": "", "npu": ""},  # noqa
+        "kona": {
+            "name": "SD865",
+            "cpu": "Kryo585:1xA76@2.84+3xA77@2.42+4XA55@1.8",
+            "gpu": "Adreno-650",
+            "npu": "TODO",
+        },  # noqa
+        "msmnile": {
+            "name": "SD855",
+            "cpu": "Kyro485:1xA76@2.84+3xA76@2.42+4xA55@1.8",
+            "gpu": "Adreno-640@585",
+            "npu": "TODO",
+        },  # noqa
+        "sdm845": {
+            "name": "SD845",
+            "cpu": "Kyro385:8x@2.8",
+            "gpu": "Adreno-630@710",
+            "npu": "TODO",
+        },  # noqa
+        "msm8998": {
+            "name": "SD835",
+            "cpu": "Kryo285:4x@2.45+4x@1.9",
+            "gpu": "Adreno-540@670/710",
+            "npu": "TODO",
+        },  # noqa
         "msm8916": {
-            "name": "",
+            "name": "SD410",
             "cpu": "4xA53@1.2",
             "gpu": "Adreno-306",
-            "npu": "",
+            "npu": "TODO",
         },  # noqa
         "msm8953": {
             "name": "SD625",
             "cpu": "8×A53@2.0",
             "gpu": "Adreno-506",
-            "npu": "",
+            "npu": "TODO",
         },  # noqa
         # kirin SoC  # noqa
         # http://www.hisilicon.com/en/Products/ProductList/Kirin
@@ -37,7 +57,7 @@ def get_soc_info_from_name(name):
             "name": "kirin710",
             "cpu": "4×A73@2.2+4×A53@1.7",
             "gpu": "Mali-G51",
-            "npu": "",
+            "npu": "None",
         },  # noqa
         "kirin820": {
             "name": "kirin820",
@@ -127,13 +147,14 @@ def get_soc_info_from_name(name):
         },  # noqa
     }
     cur_soc_dict = dict()
-    if name in soc_dict.keys():
-        cur_soc_dict = soc_dict[name]
+    if soc_code in soc_dict.keys():
+        cur_soc_dict = soc_dict[soc_code]
     else:
-        cur_soc_dict["cpu"] = ""
-        cur_soc_dict["gpu"] = ""
-        cur_soc_dict["npu"] = ""
-    cur_soc_dict["code"] = name
+        cur_soc_dict["name"] = soc_code
+        cur_soc_dict["cpu"] = "TODO"
+        cur_soc_dict["gpu"] = "TODO"
+        cur_soc_dict["npu"] = "TODO"
+    cur_soc_dict["code"] = soc_code
     return cur_soc_dict
 
 
@@ -329,7 +350,7 @@ class TestDevice(unittest.TestCase):
             imei = get_imei(ser)
             soc_code = get_soc_code(ser)
             product = get_product(ser)
-            soc_dict = get_soc_info_from_name(soc_code)
+            soc_dict = get_soc_info_from_soc_code(soc_code)
 
             logger.info("sidx:{}, ser:{}, status:{}".format(sidx, ser, status))
             logger.info("cpus_max_freq:{}".format(cpus_max_freq))

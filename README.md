@@ -1,3 +1,5 @@
+> 最新benchmark结果参见：https://github.com/AI-performance/embedded-ai.bench/releases
+
 # embedded-ai.bench
 
 ![ncnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/ncnn-android-build/badge.svg)  

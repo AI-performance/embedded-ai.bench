@@ -11,139 +11,148 @@ from utils.misc import pattern_match  # noqa
 
 
 def get_soc_info_from_soc_code(soc_code):
+    ###############################
     # summ.: http://www.mydrivers.com/zhuanti/tianti/01/index.html
     # snapdragon
+    ###############################
     soc_dict = {  # noqa
+        ###############################
         # snapdragon SoC  # noqa
+        # https://www.qualcomm.com/products/mobile-processors
+        ###############################
         "kona": {
             "name": "SD865",
-            "cpu": "Kryo585:1xA76@2.84+3xA77@2.42+4XA55@1.8",
+            "cpu": "Kryo585:1xA77@2.84+3xA77@2.42+4XA55@1.8",
             "gpu": "Adreno-650",
-            "npu": "TODO",
+            "npu/apu/xpu/dsp": "Hexagon-698",
         },  # noqa
         "msmnile": {
             "name": "SD855",
             "cpu": "Kyro485:1xA76@2.84+3xA76@2.42+4xA55@1.8",
             "gpu": "Adreno-640@585",
-            "npu": "TODO",
+            "npu/apu/xpu/dsp": "Hexagon-690",
         },  # noqa
         "sdm845": {
             "name": "SD845",
             "cpu": "Kyro385:8x@2.8",
             "gpu": "Adreno-630@710",
-            "npu": "TODO",
+            "npu/apu/xpu/dsp": "Hexagon-685",
         },  # noqa
         "msm8998": {
             "name": "SD835",
             "cpu": "Kryo285:4x@2.45+4x@1.9",
             "gpu": "Adreno-540@670/710",
-            "npu": "TODO",
+            "npu/apu/xpu/dsp": "Hexagon-682",
         },  # noqa
         "msm8916": {
             "name": "SD410",
             "cpu": "4xA53@1.2",
             "gpu": "Adreno-306",
-            "npu": "TODO",
+            "npu/apu/xpu/dsp": "HexagonDSP(QDSP6)",
         },  # noqa
         "msm8953": {
             "name": "SD625",
             "cpu": "8×A53@2.0",
             "gpu": "Adreno-506",
-            "npu": "TODO",
+            "npu/apu/xpu/dsp": "Hexagon-546",
         },  # noqa
+        ###############################
         # kirin SoC  # noqa
         # http://www.hisilicon.com/en/Products/ProductList/Kirin
+        ###############################
         "kirin710": {
             "name": "kirin710",
             "cpu": "4×A73@2.2+4×A53@1.7",
             "gpu": "Mali-G51",
-            "npu": "None",
+            "npu/apu/xpu/dsp": "None",
         },  # noqa
         "kirin820": {
             "name": "kirin820",
             "cpu": "1xA76@2.36+3xA76@2.22+4xA55@1.84",
             "gpu": "Mali-G57 MP6",
-            "npu": "D110@Lite",
+            "npu/apu/xpu/dsp": "D110@Lite",
         },  # noqa
         "kirin810": {
             "name": "kirin810",
             "cpu": "2×A76@2.27+6×A55@1.88",
             "gpu": "Mali-G52",
-            "npu": "D100@Lite",
+            "npu/apu/xpu/dsp": "D100@Lite",
         },  # noqa
         "kirin990": {
             "name": "kirin990",
             "cpu": "2xA76@2.86+2xA76@2.36+4xA55@1.95",
             "gpu": "Mali-G76 MP16",
-            "npu": "1xLite+1xTiny",
+            "npu/apu/xpu/dsp": "1xLite+1xTiny",
         },  # noqa
         "kirin985": {
             "name": "kirin985",
             "cpu": "1xA76@2.58+3xA76@2.4+4xA55@1.84",
             "gpu": "Mali-G77 MP8",
-            "npu": "1xD110@Lite+1xD100@Tiny",
+            "npu/apu/xpu/dsp": "1xD110@Lite+1xD100@Tiny",
         },  # noqa
         "kirin980": {
             "name": "kirin980",
             "cpu": "2xA76@2.6+2xA76@1.92+4xA55@1.8",
             "gpu": "Mali-G76 MP10",
-            "npu": "Dual NPU",
+            "npu/apu/xpu/dsp": "Dual NPU",
         },  # noqa
         "kirin970": {
             "name": "kirin970",
             "cpu": "4xA73+4xA53",
             "gpu": "Mali-G72 MP12",
-            "npu": "Dedicated NPU",
+            "npu/apu/xpu/dsp": "Dedicated NPU",
         },  # noqa
         "kirin960": {
             "name": "kirin960",
             "cpu": "4xA73@2.4+4xA53@1.8",
             "gpu": "Mali-G71 MP8",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
         "kirin950": {
             "name": "kirin950",
             "cpu": "4xA72@2.3+4xA53@1.8",
             "gpu": "Mali-T880 MP4",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
         "kirin930": {
             "name": "kirin930",
             "cpu": "4xA53@2.2+4xA53@1.5",
             "gpu": "Mali-628@680 MP4",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
         "kirin920": {
             "name": "kirin920",
             "cpu": "4xA15@1.7+4xA7@1.3",
             "gpu": "Mali-T624@600 MP4",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
         "kirin910": {
             "name": "kirin910",
             "cpu": "4xA9@1.6",
             "gpu": "Mali-450@533 MP4",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
         "kirin650": {
             "name": "kirin650",
             "cpu": "4xA53@2.0+4xA53@1.7",
             "gpu": "Mali-T830@900",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
         "kirin620": {
             "name": "kirin620",
             "cpu": "8xA53@1.2",
             "gpu": "Mali-450@500 MP4",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
+        ###############################
         # Samsung
         # https://www.samsung.com/semiconductor/minisite/exynos/products/all-processors/
+        ###############################
         "exynos5": {
             "name": "exynos 7872",
             "cpu": "2xA73@2.0+4xA53@1.6",
             "gpu": "Mali-G71",
-            "npu": "",
+            "npu/apu/xpu/dsp": "",
         },  # noqa
     }
     cur_soc_dict = dict()
@@ -153,7 +162,7 @@ def get_soc_info_from_soc_code(soc_code):
         cur_soc_dict["name"] = soc_code
         cur_soc_dict["cpu"] = "TODO"
         cur_soc_dict["gpu"] = "TODO"
-        cur_soc_dict["npu"] = "TODO"
+        cur_soc_dict["npu/apu/xpu/dsp"] = "TODO"
     cur_soc_dict["code"] = soc_code
     return cur_soc_dict
 

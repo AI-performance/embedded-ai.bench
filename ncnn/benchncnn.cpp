@@ -210,7 +210,7 @@ int main(int argc, char** argv)
     fprintf(stdout, "gpu_device = %d\n", gpu_device);
     fprintf(stdout, "cooling_down = %d\n", (int)g_enable_cooling_down);
 
-    benchmark(model_dir.c_str(), ncnn::Mat(227, 227, 3), opt);
+    benchmark(model_dir.c_str(), ncnn::Mat(224, 224, 3), opt);
 
 #if 0
     // run

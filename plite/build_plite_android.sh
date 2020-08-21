@@ -1,5 +1,17 @@
 set -x
 
+# cmake
+if [ ! -f "/opt/cmake-3.10/bin/cmake"]; then
+    wget -c https://mms-res.cdn.bcebos.com/cmake-3.10.3-Linux-x86_64.tar.gz && \
+        tar xzf cmake-3.10.3-Linux-x86_64.tar.gz && \
+        mv cmake-3.10.3-Linux-x86_64 /opt/cmake-3.10 && \  
+        ln -s /opt/cmake-3.10/bin/cmake /usr/bin/cmake && \
+        ln -s /opt/cmake-3.10/bin/ccmake /usr/bin/ccmake
+else
+    echo "local cmake existed"
+fi
+
+
 # download Android NDK for linux-x86_64
 #    note: Skip this step if NDK installed
 #    ref: https://developer.android.com/ndk/downloads

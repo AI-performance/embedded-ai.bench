@@ -23,6 +23,7 @@ cd plite
  --arm_os=android \
  --arm_abi=armv7 \
  --arm_lang=clang \
+ --android_stl=c++_static \
  --build_extra=ON \
  --build_cv=ON \
  tiny_publish
@@ -32,6 +33,7 @@ cd plite
  --arm_os=android \
  --arm_abi=armv8 \
  --arm_lang=clang \
+ --android_stl=c++_static \
  --build_extra=ON \
  --build_cv=ON \
  tiny_publish

@@ -12,6 +12,7 @@ else
     echo "local ${ANDROID_NDK_HOME} existed"
 fi
 export ANDROID_NDK=${ANDROID_NDK_HOME}
+export NDK_ROOT=${ANDROID_NDK_HOME}
 
 git clone https://github.com/PaddlePaddle/Paddle-Lite.git plite
 cd plite

@@ -16,7 +16,7 @@ logger = logger_creator.create_logger()
 GPU_REPEATS = 1000  # 1000
 CPU_REPEATS = 10  # 100
 WARMUP = 20  # 20
-ENABLE_MULTI_THREADS_BENCH = False  # accelerate benchmark
+ENABLE_MULTI_THREADS_BENCH = True  # accelerate benchmark
 
 MAX_TIMEOUT_SECOND = 10  # 10, not used for infer command
 MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5  # used to calc MAX_TIMEOUT_SECOND

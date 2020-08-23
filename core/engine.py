@@ -389,7 +389,7 @@ class Engine:
             bench_dict[
                 device_serial_num
             ] = self.run_bench_for_single_thread_func(  # noqa
-                device_serial_num
+                device_serial_num, device_idx=didx
             )[
                 device_serial_num
             ]
@@ -413,6 +413,7 @@ class Engine:
                 func=self.run_bench_for_single_thread_func,
                 func_args_tuple=(
                     ser,  # noqa
+                    didx,  # noqa
                     thread_idx,  # noqa
                     len(device_serials),  # noqa
                     self.config["framework_name"],
@@ -441,7 +442,12 @@ class Engine:
         return bench_dict
 
     def run_bench_for_single_thread_func(
-        self, device_serial, thread_idx=-1, thread_num=-1, framework_name=""
+        self,
+        device_serial,
+        device_idx=-1,
+        thread_idx=-1,
+        thread_num=-1,
+        framework_name="",
     ):
         logger.info(  # noqa
             "==== {}, thread_idx(from0):{}/{} ====".format(
@@ -465,6 +471,35 @@ class Engine:
         # note(ysh329): this bench_dict is for single thread about device
         bench_dict = dict()
         bench_dict[device_serial] = dict()
+        has_cpu_backend = True in list(
+            map(self.config["is_cpu_backend"], support_backend)
+        )
+        bench_case_num = (
+            len(platforms)
+            * len(model_names)
+            * sum(
+                [
+                    len(self.config["cpu_thread_num"])
+                    if has_cpu_backend
+                    else 0 + len(set(support_backend) - set("ARM"))
+                ]
+            )
+        )
+        logger.info("len(platform):{}".format(len(platforms)))
+        logger.info("len(model_names):{}".format(len(model_names)))
+        logger.info(
+            'len(self.config["cpu_thread_num"]) if "CPU" in support_backend else 0:{}'.format(  # noqa
+                len(self.config["cpu_thread_num"])
+                if "CPU" in support_backend
+                else 0  # noqa
+            )
+        )
+        logger.info(
+            'len(set(support_backend) - set("ARM")):{}'.format(
+                len(set(support_backend) - set("ARM"))
+            )
+        )
+
         bench_case_idx = 0
         # platform: armv7/armv8/...
         for pidx in range(len(platforms)):
@@ -506,8 +541,15 @@ class Engine:
                     ):
                         bench_case_idx += 1
                         logger.info(
-                            "\n\nbench_case_idx(from 1):{}".format(
-                                bench_case_idx
+                            "\n\nframework_name:{}, device_idx(from1):{}/{}, bench_case_idx(from 1):{}/{}, enable_multi_threads:{}, thread_idx(from0):{}/{}".format(  # noqa
+                                self.engine_name(),  # noqa
+                                device_idx + 1,
+                                len(device_dict),  # noqa
+                                bench_case_idx,
+                                bench_case_num,  # noqa
+                                self.config["enable_multi_threads"],  # noqa
+                                thread_idx,
+                                thread_num,  # noqa
                             )  # noqa
                         )
                         cpu_thread_num = self.config["cpu_thread_num"][tidx]  # noqa

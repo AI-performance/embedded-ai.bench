@@ -541,7 +541,7 @@ class Engine:
                     ):
                         bench_case_idx += 1
                         logger.info(
-                            "\n\nframework_name:{}, device_idx(from1):{}/{}, bench_case_idx(from 1):{}/{}, enable_multi_threads:{}, thread_idx(from0):{}/{}".format(  # noqa
+                            "\n\nframework_name:{}, device_idx(from1):{}/{}, bench_case_idx(from1):{}/{}, enable_multi_threads:{}, thread_idx(from0):{}/{}".format(  # noqa
                                 self.engine_name(),  # noqa
                                 device_idx + 1,
                                 len(device_dict),  # noqa

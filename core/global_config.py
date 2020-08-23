@@ -9,12 +9,15 @@ from utils.log import LoggerCreator  # noqa
 ##############################
 # Global Config
 ##############################
-log_enable_debug = True
+log_enable_debug = False
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
+
 GPU_REPEATS = 1000  # 1000
-CPU_REPEATS = 100  # 100
+CPU_REPEATS = 10  # 100
 WARMUP = 20  # 20
+ENABLE_MULTI_THREADS_BENCH = True  # accelerate benchmark
+
 MAX_TIMEOUT_SECOND = 10  # 10, not used for infer command
 MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5  # used to calc MAX_TIMEOUT_SECOND
 
@@ -22,6 +25,7 @@ MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5  # used to calc MAX_TIMEOUT_SECOND
 def create_config(framework_name):
     benchmark_platform = ["android-armv7", "android-armv8"]
     config = dict()
+    config["enable_multi_threads"] = ENABLE_MULTI_THREADS_BENCH
     config["warmup"] = WARMUP
     #############################
     # TNN config

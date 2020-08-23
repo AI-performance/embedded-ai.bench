@@ -25,6 +25,7 @@ from utils.device import (  # noqa
 )  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
 from utils.misc import pattern_match, get_file_name  # noqa
+from utils.threads import MyThread  # noqa
 
 
 class Engine:
@@ -361,367 +362,273 @@ class Engine:
         run_cmds(cmds)
         return 0
 
-    def gen_bench_cmds(self):
-        logger.info("==== {} ====".format(self.gen_bench_cmds.__name__))
-        device_work_dir = self.config["device_work_dir"]
-        device_dict = self.config["device_dict"]
-        model_dict = self.config["model_dict"]
-
-        device_serials = list(device_dict.keys())
-        model_names = list(model_dict.keys())
-
-        benchmark_platform = self.config["benchmark_platform"]
-        support_backend = self.config["support_backend"]
-        bench_cmd_pattern = self.config["bench_cmd_pattern"]
-        bench_dict = dict()
-        bench_case_idx = 0
-        for didx in range(len(device_serials)):
-            device_serial_num = device_serials[didx]
-            logger.debug(
-                "didx:{}, serial_num:{}".format(didx, device_serial_num)  # noqa
-            )
-            bench_dict[device_serial_num] = dict()
-            bench_cmds = []
-            for pidx in range(len(benchmark_platform)):
-                platform = benchmark_platform[pidx]
-                device_work_dir_platform = device_work_dir + "/" + platform  # noqa
-                device_benchmark_bin = "/".join(
-                    [
-                        device_work_dir_platform,
-                        os.path.basename(
-                            self.config[platform]["benchmark_bin"]
-                        ),  # noqa
-                    ]
-                )
-                bench_dict[device_serial_num][platform] = dict()
-                logger.debug("pidx:{}, platform:{}".format(pidx, platform))
-                for midx in range(len(model_names)):
-                    model_name = model_names[midx]
-                    model_dir = "/".join(
-                        [
-                            device_work_dir,
-                            os.path.basename(model_dict[model_name]),
-                        ]  # noqa
-                    )
-                    logger.debug(
-                        "midx:{}, model_name:{}, model_dir:{}".format(
-                            midx, model_name, model_dir
-                        )
-                    )
-                    bench_dict[device_serial_num][platform][model_name] = dict()  # noqa
-                    for bidx in range(len(support_backend)):
-                        backend = support_backend[bidx]
-                        is_cpu = self.config["is_cpu_backend"]
-                        logger.debug(
-                            "bidx:{}, backend:{}".format(bidx, backend)
-                        )  # noqa
-                        bench_dict[device_serial_num][platform][model_name][
-                            backend
-                        ] = dict()  # noqa
-                        for tidx in range(
-                            len(self.config["cpu_thread_num"])
-                            if is_cpu(backend)
-                            else 1  # noqa
-                        ):
-                            bench_case_idx += 1
-                            logger.info(
-                                "\n\nbench_case_idx(from 1):{}".format(
-                                    bench_case_idx
-                                )  # noqa
-                            )
-                            cpu_thread_num = self.config["cpu_thread_num"][tidx]  # noqa
-                            bench_dict[device_serial_num][platform][model_name][  # noqa
-                                backend
-                            ][
-                                cpu_thread_num
-                            ] = dict()  # noqa
-                            #######################
-                            # bench start
-                            #######################
-                            if self.config["framework_name"] == "tnn":
-                                bench_cmd = bench_cmd_pattern.format(
-                                    **{
-                                        "serial_num": device_serial_num,
-                                        "device_work_dir": device_work_dir_platform,  # noqa
-                                        "device_benchmark_bin": device_benchmark_bin,  # noqa
-                                        "model_type": self.config[
-                                            "framework_name"
-                                        ],  # noqa
-                                        "model_dir": model_dir,
-                                        "backend": backend,
-                                        "repeats": self.config["repeats"](
-                                            backend
-                                        ),  # noqa
-                                        "warmup": self.config["warmup"],
-                                        "thread_num": cpu_thread_num,
-                                        "bind_cpu_idx": device_dict[
-                                            device_serial_num
-                                        ][  # noqa
-                                            "bind_cpu_idx"
-                                        ],
-                                    }
-                                )
-                            elif self.config["framework_name"] == "ncnn":
-                                bench_cmd = bench_cmd_pattern.format(
-                                    **{
-                                        "serial_num": device_serial_num,
-                                        "device_benchmark_bin": device_benchmark_bin,  # noqa
-                                        "model_dir": model_dir,
-                                        "repeats": self.config["repeats"](
-                                            backend
-                                        ),  # noqa
-                                        "warmup": self.config["warmup"],
-                                        "thread_num": cpu_thread_num,
-                                        "power_mode": self.config[
-                                            "power_mode_id"
-                                        ],  # noqa
-                                        "gpu_device": backend,
-                                    }
-                                )
-                            elif self.config["framework_name"] == "mnn":
-                                # '{device_benchmark_bin} {model_dir} {repeats} {warmup}'  # noqa
-                                # '{forwardtype} {thread_num} {precision}"'
-                                bench_cmd = bench_cmd_pattern.format(
-                                    **{
-                                        "serial_num": device_serial_num,
-                                        "device_work_dir": device_work_dir_platform,  # noqa
-                                        "device_benchmark_bin": device_benchmark_bin,  # noqa
-                                        "model_dir": model_dir,
-                                        "repeats": self.config["repeats"](
-                                            backend
-                                        ),  # noqa
-                                        "warmup": self.config["warmup"],
-                                        "thread_num": cpu_thread_num,
-                                        "forwardtype": backend,
-                                        # power_mode: big_core default
-                                    }
-                                )
-                            else:
-                                logger.fatal(
-                                    "Unsupported framework {}".format(
-                                        self.config["framework_name"]
-                                    )
-                                )
-                                continue
-                            bench_cmds.append(bench_cmd)
-            bench_dict[device_serial_num]["bench_cmds"] = bench_cmds
-        return bench_dict
-
-    def run_bench_v2(self, bench_dict):
-        logger.info("==== {} ====".format(self.run_bench_v2.__name__))
-        device_serials = list(bench_dict.keys())
-        for didx in range(len(device_serials)):
-            ser = device_serials[didx]
-            cmds = bench_dict[ser]
-            logger.info(
-                "didx: {}, ser: {}, cmds: {}".format(  # noqa
-                    didx, ser, len(cmds)
-                )  # noqa
-            )
-
     def run_bench(self):
         logger.info("==== {} ====".format(self.run_bench.__name__))
-        device_work_dir = self.config["device_work_dir"]
+        logger.info(
+            "enable_multi_threads:{}".format(  # noqa
+                self.config["enable_multi_threads"]
+            )
+        )
+        if self.config["enable_multi_threads"]:
+            return self.run_bench_multi_threads()
+        else:  # use single thread
+            return self.run_bench_single_thread()
+
+    def run_bench_single_thread(self):
+        logger.info(
+            "==== {} ====".format(self.run_bench_single_thread.__name__)  # noqa
+        )
         device_dict = self.config["device_dict"]
-        model_dict = self.config["model_dict"]
-
         device_serials = list(device_dict.keys())
-        model_names = list(model_dict.keys())
-
-        benchmark_platform = self.config["benchmark_platform"]
-        support_backend = self.config["support_backend"]
-        bench_cmd_pattern = self.config["bench_cmd_pattern"]
         bench_dict = dict()
-        bench_case_idx = 0
         for didx in range(len(device_serials)):
             device_serial_num = device_serials[didx]
             logger.debug(
                 "didx:{}, serial_num:{}".format(didx, device_serial_num)  # noqa
             )
-            bench_dict[device_serial_num] = dict()
-            for pidx in range(len(benchmark_platform)):
-                platform = benchmark_platform[pidx]
-                device_work_dir_platform = device_work_dir + "/" + platform  # noqa
-                device_benchmark_bin = "/".join(
-                    [
-                        device_work_dir_platform,
-                        os.path.basename(
-                            self.config[platform]["benchmark_bin"]
-                        ),  # noqa
-                    ]
+            bench_dict[
+                device_serial_num
+            ] = self.run_bench_for_single_thread_func(  # noqa
+                device_serial_num
+            )[
+                device_serial_num
+            ]
+        return bench_dict
+
+    def run_bench_multi_threads(self):
+        logger.info(
+            "==== {} ====".format(self.run_bench_multi_threads.__name__)  # noqa
+        )
+        device_serials = list(self.config["device_dict"].keys())
+        device_threads = dict()
+        for didx in range(len(device_serials)):
+            thread_idx = didx
+            ser = device_serials[didx]
+            logger.info(
+                "create device(thread)_idx(from1):{}/{}, serial_num:{}".format(
+                    didx + 1, len(device_serials), ser
+                )  # noqa
+            )
+            device_threads[ser] = MyThread(
+                func=self.run_bench_for_single_thread_func,
+                func_args_tuple=(
+                    ser,  # noqa
+                    thread_idx,  # noqa
+                    len(device_serials),  # noqa
+                    self.config["framework_name"],
+                ),  # noqa
+                device_serial=ser,
+                thread_idx=thread_idx,
+                thread_num=len(device_serials),
+                framework_name=self.config["framework_name"],
+            )
+
+        assert len(device_threads) == len(device_serials)
+
+        for tidx in range(len(device_threads)):
+            ser = device_serials[tidx]
+            device_threads[ser].start()
+
+        for tidx in range(len(device_threads)):
+            ser = device_serials[tidx]
+            device_threads[ser].join()
+
+        bench_dict = dict()
+        bench_dict[ser] = dict()
+        for tidx in range(len(device_threads)):
+            ser = device_serials[tidx]
+            bench_dict[ser] = device_threads[ser].get_result()[ser]
+        return bench_dict
+
+    def run_bench_for_single_thread_func(
+        self, device_serial, thread_idx=-1, thread_num=-1, framework_name=""
+    ):
+        logger.info(  # noqa
+            "==== {}, thread_idx(from0):{}/{} ====".format(
+                self.run_bench_for_single_thread_func.__name__,
+                thread_idx,
+                thread_num,  # noqa
+            )
+        )
+        device_work_dir = self.config["device_work_dir"]
+        device_dict = self.config["device_dict"]
+        cur_device_dict = device_dict[device_serial]
+        logger.info("cur_device_dict:{}".format(cur_device_dict))
+
+        model_dict = self.config["model_dict"]
+        model_names = list(model_dict.keys())
+
+        platforms = self.config["benchmark_platform"]
+        support_backend = self.config["support_backend"]
+        bench_cmd_pattern = self.config["bench_cmd_pattern"]
+
+        # note(ysh329): this bench_dict is for single thread about device
+        bench_dict = dict()
+        bench_dict[device_serial] = dict()
+        bench_case_idx = 0
+        # platform: armv7/armv8/...
+        for pidx in range(len(platforms)):
+            platform = platforms[pidx]
+            device_work_dir_platform = device_work_dir + "/" + platform  # noqa
+            device_benchmark_bin = "/".join(
+                [
+                    device_work_dir_platform,
+                    os.path.basename(self.config[platform]["benchmark_bin"]),  # noqa
+                ]
+            )
+            bench_dict[device_serial][platform] = dict()
+            logger.debug("pidx:{}, platform:{}".format(pidx, platform))
+            # model: mobilenetv1/v2/...
+            for midx in range(len(model_names)):
+                model_name = model_names[midx]
+                model_dir = "/".join(
+                    [device_work_dir, os.path.basename(model_dict[model_name]),]  # noqa
                 )
-                bench_dict[device_serial_num][platform] = dict()
-                logger.debug("pidx:{}, platform:{}".format(pidx, platform))
-                for midx in range(len(model_names)):
-                    model_name = model_names[midx]
-                    model_dir = "/".join(
-                        [
-                            device_work_dir,
-                            os.path.basename(model_dict[model_name]),
-                        ]  # noqa
+                logger.debug(
+                    "midx:{}, model_name:{}, model_dir:{}".format(
+                        midx, model_name, model_dir
                     )
-                    logger.debug(
-                        "midx:{}, model_name:{}, model_dir:{}".format(
-                            midx, model_name, model_dir
+                )
+                bench_dict[device_serial][platform][model_name] = dict()  # noqa
+                # backend: cpu/gpu/xpu/...
+                for bidx in range(len(support_backend)):
+                    backend = support_backend[bidx]
+                    is_cpu = self.config["is_cpu_backend"]
+                    logger.debug("bidx:{}, backend:{}".format(bidx, backend))  # noqa
+                    bench_dict[device_serial][platform][model_name][
+                        backend
+                    ] = dict()  # noqa
+                    # thread: 1/2/4/...
+                    for tidx in range(
+                        len(self.config["cpu_thread_num"])
+                        if is_cpu(backend)
+                        else 1  # noqa
+                    ):
+                        bench_case_idx += 1
+                        logger.info(
+                            "\n\nbench_case_idx(from 1):{}".format(
+                                bench_case_idx
+                            )  # noqa
                         )
-                    )
-                    bench_dict[device_serial_num][platform][model_name] = dict()  # noqa
-                    for bidx in range(len(support_backend)):
-                        backend = support_backend[bidx]
-                        is_cpu = self.config["is_cpu_backend"]
-                        logger.debug(
-                            "bidx:{}, backend:{}".format(bidx, backend)
-                        )  # noqa
-                        bench_dict[device_serial_num][platform][model_name][
+                        cpu_thread_num = self.config["cpu_thread_num"][tidx]  # noqa
+                        bench_dict[device_serial][platform][model_name][  # noqa
                             backend
+                        ][
+                            cpu_thread_num
                         ] = dict()  # noqa
-                        for tidx in range(
-                            len(self.config["cpu_thread_num"])
-                            if is_cpu(backend)
-                            else 1  # noqa
-                        ):
-                            bench_case_idx += 1
-                            logger.info(
-                                "\n\nbench_case_idx(from 1):{}".format(
-                                    bench_case_idx
-                                )  # noqa
+                        #######################
+                        # bench case start
+                        #######################
+                        if self.config["framework_name"] == "tnn":
+                            bench_cmd = bench_cmd_pattern.format(
+                                **{
+                                    "serial_num": device_serial,
+                                    "device_work_dir": device_work_dir_platform,  # noqa
+                                    "device_benchmark_bin": device_benchmark_bin,  # noqa
+                                    "model_type": self.config["framework_name"],  # noqa
+                                    "model_dir": model_dir,
+                                    "backend": backend,
+                                    "repeats": self.config["repeats"](backend),  # noqa
+                                    "warmup": self.config["warmup"],
+                                    "thread_num": cpu_thread_num,
+                                    "bind_cpu_idx": device_dict[device_serial][  # noqa
+                                        "bind_cpu_idx"
+                                    ],
+                                }
                             )
-                            cpu_thread_num = self.config["cpu_thread_num"][tidx]  # noqa
-                            bench_dict[device_serial_num][platform][model_name][  # noqa
-                                backend
-                            ][
-                                cpu_thread_num
-                            ] = dict()  # noqa
-                            #######################
-                            # bench start
-                            #######################
-                            if self.config["framework_name"] == "tnn":
-                                bench_cmd = bench_cmd_pattern.format(
-                                    **{
-                                        "serial_num": device_serial_num,
-                                        "device_work_dir": device_work_dir_platform,  # noqa
-                                        "device_benchmark_bin": device_benchmark_bin,  # noqa
-                                        "model_type": self.config[
-                                            "framework_name"
-                                        ],  # noqa
-                                        "model_dir": model_dir,
-                                        "backend": backend,
-                                        "repeats": self.config["repeats"](
-                                            backend
-                                        ),  # noqa
-                                        "warmup": self.config["warmup"],
-                                        "thread_num": cpu_thread_num,
-                                        "bind_cpu_idx": device_dict[
-                                            device_serial_num
-                                        ][  # noqa
-                                            "bind_cpu_idx"
-                                        ],
-                                    }
+                        elif self.config["framework_name"] == "ncnn":
+                            bench_cmd = bench_cmd_pattern.format(
+                                **{
+                                    "serial_num": device_serial,
+                                    "device_benchmark_bin": device_benchmark_bin,  # noqa
+                                    "model_dir": model_dir,
+                                    "repeats": self.config["repeats"](backend),  # noqa
+                                    "warmup": self.config["warmup"],
+                                    "thread_num": cpu_thread_num,
+                                    "power_mode": self.config["power_mode_id"],  # noqa
+                                    "gpu_device": backend,
+                                }
+                            )
+                        elif self.config["framework_name"] == "mnn":
+                            # '{device_benchmark_bin} {model_dir} {repeats} {warmup}'  # noqa
+                            # '{forwardtype} {thread_num} {precision}"'
+                            bench_cmd = bench_cmd_pattern.format(
+                                **{
+                                    "serial_num": device_serial,
+                                    "device_work_dir": device_work_dir_platform,  # noqa
+                                    "device_benchmark_bin": device_benchmark_bin,  # noqa
+                                    "model_dir": model_dir,
+                                    "repeats": self.config["repeats"](backend),  # noqa
+                                    "warmup": self.config["warmup"],
+                                    "thread_num": cpu_thread_num,
+                                    "forwardtype": backend,
+                                    # power_mode: big_core default
+                                }
+                            )
+                        else:
+                            logger.fatal(
+                                "Unsupported framework {}".format(
+                                    self.config["framework_name"]
                                 )
-                            elif self.config["framework_name"] == "ncnn":
-                                bench_cmd = bench_cmd_pattern.format(
-                                    **{
-                                        "serial_num": device_serial_num,
-                                        "device_benchmark_bin": device_benchmark_bin,  # noqa
-                                        "model_dir": model_dir,
-                                        "repeats": self.config["repeats"](
-                                            backend
-                                        ),  # noqa
-                                        "warmup": self.config["warmup"],
-                                        "thread_num": cpu_thread_num,
-                                        "power_mode": self.config[
-                                            "power_mode_id"
-                                        ],  # noqa
-                                        "gpu_device": backend,
-                                    }
-                                )
-                            elif self.config["framework_name"] == "mnn":
-                                # '{device_benchmark_bin} {model_dir} {repeats} {warmup}'  # noqa
-                                # '{forwardtype} {thread_num} {precision}"'
-                                bench_cmd = bench_cmd_pattern.format(
-                                    **{
-                                        "serial_num": device_serial_num,
-                                        "device_work_dir": device_work_dir_platform,  # noqa
-                                        "device_benchmark_bin": device_benchmark_bin,  # noqa
-                                        "model_dir": model_dir,
-                                        "repeats": self.config["repeats"](
-                                            backend
-                                        ),  # noqa
-                                        "warmup": self.config["warmup"],
-                                        "thread_num": cpu_thread_num,
-                                        "forwardtype": backend,
-                                        # power_mode: big_core default
-                                    }
-                                )
-                            else:
-                                logger.fatal(
-                                    "Unsupported framework {}".format(
-                                        self.config["framework_name"]
-                                    )
-                                )
-                                exit(1)
-                            #################################
-                            # run benchmark
-                            #################################
-                            run_times_sum = (
-                                self.config["repeats"](backend)
-                                + self.config["warmup"]  # noqa
-                            )  # noqa
-                            max_wait_sec = (
-                                MAX_TIMEOUT_SECOND_ONCE_INFER * run_times_sum
-                            )  # noqa
-                            cmd_res = run_cmd(
-                                bench_cmd,
-                                wait_interval_sec=3,
-                                max_timeout_sec=max_wait_sec,
-                            )  # noqa
-                            perf_dict = self.parse_benchmark(cmd_res)
-                            #################################
-                            # summarize benchmark info
-                            #################################
-                            bench_record = {
-                                "soc_code": device_dict[device_serial_num][
-                                    "soc_code"
-                                ],  ## noqa
-                                "product": device_dict[device_serial_num][  # noqa
-                                    "product"
-                                ],  # noqa
-                                "serial_num": device_serial_num,
-                                "platform": platform,
-                                "model_name": model_name,
-                                "repeats": self.config["repeats"](backend),
-                                "warmup": self.config["warmup"],
-                                "avg": perf_dict["avg"],
-                                "max": perf_dict["max"],
-                                "min": perf_dict["min"],
-                                "std_dev": perf_dict["std_dev"],
-                                "backend": backend,
-                                "cpu_thread_num": cpu_thread_num,
-                                "power_mode": self.config["power_mode"],
-                                "bind_cpu_idx": device_dict[device_serial_num][
-                                    "bind_cpu_idx"
-                                ],
-                                "cpu_max_freqs": device_dict[device_serial_num][  # noqa
-                                    "cpu_max_freqs"
-                                ],
-                                "battery_level": device_dict[device_serial_num][  # noqa
-                                    "battery_level"
-                                ],
-                                "system_version": device_dict[
-                                    device_serial_num
-                                ][  # noqa
-                                    "system_version"
-                                ],
-                                "cmd": bench_cmd,
-                                "imei": device_dict[device_serial_num]["imei"],
-                            }
-                            bench_dict[device_serial_num][platform][model_name][  # noqa
-                                backend
-                            ][
-                                cpu_thread_num
-                            ] = bench_record  # noqa
-                            # bench_dict[model_name].append(bench_record)
-                            logger.info(bench_record)
+                            )
+                            exit(1)
+                        #################################
+                        # run benchmark
+                        #################################
+                        run_times_sum = (
+                            self.config["repeats"](backend)
+                            + self.config["warmup"]  # noqa
+                        )  # noqa
+                        max_wait_sec = (
+                            MAX_TIMEOUT_SECOND_ONCE_INFER * run_times_sum
+                        )  # noqa
+                        cmd_res = run_cmd(
+                            bench_cmd,
+                            wait_interval_sec=3,
+                            max_timeout_sec=max_wait_sec,
+                        )  # noqa
+                        perf_dict = self.parse_benchmark(cmd_res)
+                        #################################
+                        # summarize benchmark info
+                        #################################
+                        bench_record = {
+                            "soc_code": device_dict[device_serial]["soc_code"],  ## noqa
+                            "product": device_dict[device_serial][  # noqa
+                                "product"
+                            ],  # noqa
+                            "serial_num": device_serial,
+                            "platform": platform,
+                            "model_name": model_name,
+                            "repeats": self.config["repeats"](backend),
+                            "warmup": self.config["warmup"],
+                            "avg": perf_dict["avg"],
+                            "max": perf_dict["max"],
+                            "min": perf_dict["min"],
+                            "std_dev": perf_dict["std_dev"],
+                            "backend": backend,
+                            "cpu_thread_num": cpu_thread_num,
+                            "power_mode": self.config["power_mode"],
+                            "bind_cpu_idx": device_dict[device_serial][
+                                "bind_cpu_idx"
+                            ],  # noqa
+                            "cpu_max_freqs": device_dict[device_serial][  # noqa
+                                "cpu_max_freqs"
+                            ],
+                            "battery_level": device_dict[device_serial][  # noqa
+                                "battery_level"
+                            ],
+                            "system_version": device_dict[device_serial][  # noqa
+                                "system_version"
+                            ],
+                            "cmd": bench_cmd,
+                            "imei": device_dict[device_serial]["imei"],
+                        }
+                        bench_dict[device_serial][platform][model_name][  # noqa
+                            backend
+                        ][
+                            cpu_thread_num
+                        ] = bench_record  # noqa
+                        logger.info(bench_record)
         return bench_dict
 
     def parse_benchmark(self, cmd_res):
@@ -853,7 +760,7 @@ class Engine:
                             ].keys()  # noqa
                         )  # noqa
                         for tidx in range(len(cpu_thread_nums)):
-                            cpu_thread_num = cpu_thread_nums[tidx]
+                            cpu_thread_num = cpu_thread_nums[tidx]  # noqa
                             # get record
                             record_dict = bench_dict[serial][platform][
                                 model_name
@@ -862,6 +769,7 @@ class Engine:
                             ][
                                 cpu_thread_num
                             ]  # noqa
+                            logger.debug("record_dict:{}".format(record_dict))
                             record = [
                                 self.config["framework_name"],
                                 self.config["framework_repo_branch"],
@@ -872,7 +780,7 @@ class Engine:
                                 soc_info_dict["name"],
                                 soc_info_dict["cpu"],
                                 soc_info_dict["gpu"],
-                                soc_info_dict["npu"],
+                                soc_info_dict["npu/apu/xpu/dsp"],
                                 record_dict["product"],
                                 record_dict["power_mode"],
                                 self.config["support_backend_id"](
@@ -1041,7 +949,7 @@ class TestEngine(unittest.TestCase):
         mnn.set_config(
             "support_backend", ["0"]
         )  # 0->CPU，1->Metal，3->OpenCL，6->OpenGL，7->Vulkan
-        mnn.set_config("cpu_thread_num", [4])  # [1, 2, 4]
+        mnn.set_config("cpu_thread_num", [2, 4])  # [1, 2, 4]
         mnn.config["warmup"] = 2
         model_dict = mnn.prepare_models()
         device_dict = mnn.prepare_devices()
@@ -1055,8 +963,7 @@ class TestEngine(unittest.TestCase):
         mnn.prepare_benchmark_assets_for_devices()
 
         bench_dict = mnn.run_bench()
-        # bench_dict = mnn.gen_bench_cmds()
-        # mnn.run_bench_v2(bench_dict)
+        # bench_dict = mnn.run_bench_multi_threads()
         summary_list = mnn.generate_benchmark_summary(bench_dict)
         summary_str = "\n".join(summary_list)
         logger.info("summary_str:\n{}".format(summary_str))

@@ -21,6 +21,11 @@ if [ ! -d "./ncnn/ncnn" ]; then
     cd ncnn && git clone https://github.com/Tencent/NCNN.git ncnn
 fi
 
+if [ ! -d "./plite/plite" ]; then
+    cd plite && git clone https://github.com/PaddlePaddle/Paddle-Lite.git plite
+fi
+
+
 # shellcheck disable=SC2068
 for py_dir in ${PYDIR_LIST[@]}; do
     # shellcheck disable=SC2045

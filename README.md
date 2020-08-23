@@ -80,14 +80,14 @@ AI-Performance开源组织，以中立、公平、公正、公开为组织准则
 
 在确认「开发者模式」开启后，还是不出现设备，那就需要尝试以下，一般都能解决：
 
-USB连接设置从「仅充电」改为「传输文件」；
-换USB接口（可能电压）；
-加vendor ID到~/.android/adb_usb.ini然后adb kill-server再adb start-server；
-重启手机；
-重启电脑；
-换数据线（我之前发现有这个情况）；
-华为手机的CD 驱动器Hisuite会占用adb。弹出该驱动器；
-手机刷机。
+1. USB连接设置从「仅充电」改为「传输文件」；
+2. 换USB接口（可能电压）；
+3. 加vendor ID到~/.android/adb_usb.ini然后adb kill-server再adb start-server；
+4. 重启手机；
+5. 重启电脑；
+6. 换数据线（我之前发现有这个情况）；
+7. 华为手机的CD 驱动器Hisuite会占用adb。弹出该驱动器；
+8. 手机刷机。
 
     
 ## 开发须知

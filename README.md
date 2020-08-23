@@ -72,7 +72,23 @@ python bench.py
 禁止除AI-Performance开源组织以外的主体，【公开】发布【基于本项目的benchmark结果】，若公开发布则视为侵权，AI-Performance有权追诉法律责任。
 
 AI-Performance开源组织，以中立、公平、公正、公开为组织准则，致力于打造制定AI领域的benchmark标准。
-    
+
+
+## 常见问题
+
+### 1. adb找不到设备，一般是没开启开发者模式，
+
+在确认「开发者模式」开启后，还是不出现设备，那就需要尝试以下，一般都能解决：
+
+USB连接设置从「仅充电」改为「传输文件」；
+换USB接口（可能电压）；
+加vendor ID到~/.android/adb_usb.ini然后adb kill-server再adb start-server；
+重启手机；
+重启电脑；
+换数据线（我之前发现有这个情况）；
+华为手机的CD 驱动器Hisuite会占用adb。弹出该驱动器；
+手机刷机。
+
     
 ## 开发须知
 

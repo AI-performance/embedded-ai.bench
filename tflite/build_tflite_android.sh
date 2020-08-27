@@ -1,6 +1,6 @@
 set -x
 
-#git clone https://github.com/tensorflow/tensorflow.git
+# ref: https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android
 git clone https://gitee.com/mirrors/tensorflow.git tflite
 cd tflite
 

@@ -1,5 +1,16 @@
 set -x
 
+# download Android NDK for linux-x86_64
+#    note: Skip this step if NDK installed
+#    ref: https://developer.android.com/ndk/downloads
+if [ ! -d ${ANDROID_NDK_HOME} ]; then
+    cd /tmp && wget -c https://dl.google.com/android/repository/android-ndk-r17c-linux-x86_64.zip
+    cd /opt && unzip /tmp/android-ndk-r17c-linux-x86_64.zip
+else
+    echo "local ${ANDROID_NDK_HOME} existed"
+fi
+cd -
+
 # ref: https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android
 git clone https://gitee.com/mirrors/tensorflow.git tflite
 

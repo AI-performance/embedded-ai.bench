@@ -15,8 +15,8 @@ cd -
 git clone https://gitee.com/mirrors/tensorflow.git tflite
 cd tflite
 
-apt update
-apt install -y curl gnupg
+sudo apt update
+sudo apt install -y curl gnupg
 
 
 

@@ -4,7 +4,8 @@
 
 ![ncnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/ncnn-android-build/badge.svg)  
 ![tnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/tnn-android-build/badge.svg)  
-![mnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/mnn-android-build/badge.svg)
+![mnn-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/mnn-android-build/badge.svg)  
+![tflite-android-build](https://github.com/AI-performance/embedded-ai.bench/workflows/tflite-android-build/badge.svg)
 
 - 一键编译：拉取框架代码，编译库；
 - 一键转换：拉取原始模型、编译转换工具、转换模型；

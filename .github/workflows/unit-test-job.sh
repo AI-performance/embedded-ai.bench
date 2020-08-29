@@ -25,6 +25,11 @@ if [ ! -d "./plite/plite" ]; then
     cd plite && git clone https://github.com/PaddlePaddle/Paddle-Lite.git plite
 fi
 
+if [ ! -d "./tflite/tflite" ]; then
+    cd tflite && git clone https://github.com/TensorFlow/TensorFlow.git tflite
+fi
+
+
 
 # shellcheck disable=SC2068
 for py_dir in ${PYDIR_LIST[@]}; do

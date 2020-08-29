@@ -13,7 +13,6 @@ cd -
 
 # ref: https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android
 git clone https://gitee.com/mirrors/tensorflow.git tflite
-
 cd tflite
 
 apt update
@@ -32,6 +31,7 @@ cd "/usr/local/lib/bazel/bin" && curl -LO https://releases.bazel.build/3.1.0/rel
 cd -
 
 
+cp ../configure.py.bench ./configure.py
 ./configure
 # android: y
 # ndk path: /opt/android-ndk-r17c/

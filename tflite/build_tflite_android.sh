@@ -4,9 +4,10 @@ set -x
 #    note: Skip this step if NDK installed
 #    ref: https://developer.android.com/ndk/downloads
 if [ ! -d ${ANDROID_NDK_HOME} ]; then
+    pwd_dir="$(pwd)"
     cd /tmp && wget -c https://dl.google.com/android/repository/android-ndk-r17c-linux-x86_64.zip
     cd /opt && unzip /tmp/android-ndk-r17c-linux-x86_64.zip
-    cd -
+    cd $pwd_dir
 else
     echo "local ${ANDROID_NDK_HOME} existed"
 fi
@@ -17,8 +18,6 @@ cd tflite
 
 sudo apt update
 sudo apt install -y curl gnupg
-
-
 
 #curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 #echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list

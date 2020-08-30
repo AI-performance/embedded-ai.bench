@@ -15,13 +15,13 @@ else
 fi
 
 # ref: https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android
-#git clone https://gitee.com/mirrors/tensorflow.git tflite
-git clone https://github.com/TensorFlow/Tensorflow.git tflite
+git clone https://gitee.com/mirrors/tensorflow.git tflite
+#git clone https://github.com/TensorFlow/Tensorflow.git tflite
 cd tflite
 
 sudo apt update
 sudo apt install -y curl gnupg
-
+pip3 install numpy
 #curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 #echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
 #sudo apt update && sudo apt install bazel
@@ -42,11 +42,13 @@ cd ${TFLITE_DIR}/tflite
 
 bazel build -c opt \
   --config=android_arm \
-  tensorflow/lite/tools/benchmark:benchmark_model
+  tensorflow/lite/tools/benchmark:benchmark_model \
+  --verbose_failures
 # bazel-tflite/bazel-out/arm64-v8a-opt/bin/tensorflow/lite/tools/benchmark/benchmark_model
 
 
 bazel build -c opt \
   --config=android_arm64 \
-  tensorflow/lite/tools/benchmark:benchmark_model
+  tensorflow/lite/tools/benchmark:benchmark_model \
+  --verbose_failures
 # bazel-tflite/bazel-out/arm64-v8a-opt/bin/tensorflow/lite/tools/benchmark/benchmark_model

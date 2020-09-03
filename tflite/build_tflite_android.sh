@@ -9,9 +9,16 @@ if [ ! -d ${ANDROID_NDK_HOME} ]; then
     echo $pwd_dir
     cd /tmp && wget -c https://dl.google.com/android/repository/android-ndk-r17c-linux-x86_64.zip
     cd /opt && unzip /tmp/android-ndk-r17c-linux-x86_64.zip
+    export ANDROID_NDK_HOME=/opt/android-ndk-r17c
     cd $pwd_dir
 else
-    echo "local ${ANDROID_NDK_HOME} existed"
+    echo "ENV ANDROID_NDK_HOME existed: ${ANDROID_NDK_HOME}"
+fi
+
+# download Android SDK for linux-x86_64
+if [ ! -d ${ANDROID_SDK_HOME} ]; then
+    cd /opt && git clone https://github.com/ai-performance/android_sdk.git
+    export ANDROID_SDK_HOME=/opt/android_sdk
 fi
 
 # ref: https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android

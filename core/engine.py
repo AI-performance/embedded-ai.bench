@@ -483,14 +483,24 @@ class Engine:
             * sum(
                 [
                     len(self.config["cpu_thread_num"]) * cpu_backend_num
-                    + len(
-                        set(support_backend) - set("ARM") - set("ARM_XNNPACK")
-                    )  # noqa
+                    + len(set(support_backend) - set(["ARM", "ARM_XNNPACK"]))  # noqa
                 ]
             )
         )
         logger.info("len(platform):{}".format(len(platforms)))
         logger.info("len(model_names):{}".format(len(model_names)))
+        logger.info(
+            'len(self.config["cpu_thread_num"]) * cpu_backend_num:{}'.format(
+                len(self.config["cpu_thread_num"]) * cpu_backend_num
+            )
+        )
+        logger.info("support_backend:{}".format(support_backend))
+        logger.info(
+            'len(set(support_backend) - set("ARM") - set("ARM_XNNPACK")):{}'.format(  # noqa
+                len(set(support_backend) - set("ARM") - set("ARM_XNNPACK"))
+            )
+        )
+        logger.info("bench_case_num:{}".format(bench_case_num))
         logger.info(
             'len(self.config["cpu_thread_num"]) if "CPU" in support_backend else 0:{}'.format(  # noqa
                 len(self.config["cpu_thread_num"])

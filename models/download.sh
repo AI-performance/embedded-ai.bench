@@ -107,6 +107,8 @@ function tensorflow_model_urls() {
                           "https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz" \
                            \ # vgg16
                           "http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz" \
+                           \ # squeezenet
+                          "https://storage.googleapis.com/download.tensorflow.org/models/tflite/model_zoo/upload_20180427/squeezenet_2018_04_27.tgz" \
                          )
     echo ${links_for_tensorflow[*]}
 }
@@ -131,6 +133,11 @@ function rename_tensorflow_models() {
     tar -zxvf ./vgg_16_2016_08_28.tar.gz
     mkdir tf_vgg16
     mv vgg_16.ckpt ./tf_vgg16/tf_vgg16.ckpt
+    
+    # squeezenet
+    tar -zxvf squeezenet_2018_04_27.tgz
+    mkdir tf_squeezenet_v1.1
+    mv squeeze* ./tf_squeezenet_v1.1
 }
 
 function prepare_tensorflow_models() {

@@ -109,6 +109,12 @@ function tensorflow_model_urls() {
                           "http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz" \
                            \ # squeezenet
                           "https://storage.googleapis.com/download.tensorflow.org/models/tflite/model_zoo/upload_20180427/squeezenet_2018_04_27.tgz" \
+                           \ # mobilenetv1_quant
+                          "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_08_02/mobilenet_v1_1.0_224_quant.tgz" \
+                           \ # mobilenetv2_quant \
+                          "https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224_quant.tgz" \
+                          \ # mnasnet_1.0_224 \
+                          "https://storage.cloud.google.com/download.tensorflow.org/models/tflite/mnasnet_1.0_224_09_07_2018.tgz" \
                          )
     echo ${links_for_tensorflow[*]}
 }
@@ -138,6 +144,21 @@ function rename_tensorflow_models() {
     tar -zxvf squeezenet_2018_04_27.tgz
     mkdir tf_squeezenet_v1.1
     mv squeeze* ./tf_squeezenet_v1.1
+
+    # mobilenetv1 quant
+    tar -zxvf mobilenet_v1_1.0_224_quant.tgz
+    mkdir tf_mobilenetv1_quant
+    mv mobilenet_v1_1.0_224_quant* ./tf_mobilenetv1_quant
+
+    # mobilenetv2 quant
+    tar -zxvf mobilenet_v2_1.0_224_quant.tgz
+    mkdir tf_mobilenetv2_quant
+    mv mobilenet_v2_1.0_224_quant* ./tf_mobilenetv2_quant
+
+    # mnasnet 1.0 224
+    tar -zxvf mnasnet_1.0_224_09_07_2018.tgz
+    mkdir tf_mnasnet_1.0_224
+    mv mnasnet* ./tf_mnasnet_1.0_224
 }
 
 function prepare_tensorflow_models() {

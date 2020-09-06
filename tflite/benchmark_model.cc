@@ -52,7 +52,7 @@ void BenchmarkLoggingListener::OnBenchmarkEnd(const BenchmarkResults& results) {
   auto init_mem_usage = results.init_mem_usage();
   auto overall_mem_usage = results.overall_mem_usage();
 
-  std::cout << " min=" << inference_us.min() / 1000.
+  std::cout << "time cost: min=" << inference_us.min() / 1000.
             << " max=" << inference_us.max() / 1000.
             << " avg=" << inference_us.avg() / 1000.
             << " std_dev=" << inference_us.std_deviation() / 1000.

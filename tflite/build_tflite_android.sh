@@ -22,8 +22,8 @@ if [ ! -d ${ANDROID_SDK_HOME} ]; then
 fi
 
 # ref: https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android
-git clone https://gitee.com/mirrors/tensorflow.git tflite
-#git clone https://github.com/TensorFlow/Tensorflow.git tflite
+#git clone https://gitee.com/mirrors/tensorflow.git tflite
+git clone https://github.com/TensorFlow/Tensorflow.git tflite
 cd tflite
 
 sudo apt update
@@ -42,6 +42,7 @@ cd -
 
 
 cp ${TFLITE_DIR}/configure.py.bench ${TFLITE_DIR}/tflite/configure.py
+cp ${TFLITE_DIR}/benchmark_model.cc ${TFLITE_DIR}/tflite/tensorflow/lite/tools/benchmark/benchmark_model.cc
 cd ${TFLITE_DIR}/tflite
 ./configure
 # android: y

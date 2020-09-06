@@ -116,7 +116,7 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
     double time_min = DBL_MAX;
     double time_max = -DBL_MAX;
     double time_avg = 0;
-    double time_std_dev = -1;
+    double time_std_dev = 0;
     std::vector<double> times;
 
 

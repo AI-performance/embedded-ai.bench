@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -x
 
 #alias wget_enhance='wget -c'
 enable_quiet_wget=OFF
@@ -142,23 +142,27 @@ function rename_tensorflow_models() {
     
     # squeezenet
     tar -zxvf squeezenet_2018_04_27.tgz
-    mkdir tf_squeezenet_v1.1
-    mv squeeze* ./tf_squeezenet_v1.1
+    mkdir tf_squeezenetv1.1
+    mv squeeze* ./tf_squeezenetv1.1
+    cp tf_squeezenetv1.1/squeezenet.tflite tf_squeezenetv1.1/tf_squeezenetv1.1.tflite
 
     # mobilenetv1 quant
     tar -zxvf mobilenet_v1_1.0_224_quant.tgz
     mkdir tf_mobilenetv1_quant
     mv mobilenet_v1_1.0_224_quant* ./tf_mobilenetv1_quant
+    cp tf_mobilenetv1_quant/mobilenet_v1_1.0_224_quant.tflite tf_mobilenetv1_quant/tf_mobilenetv1_quant.tflite
 
     # mobilenetv2 quant
     tar -zxvf mobilenet_v2_1.0_224_quant.tgz
     mkdir tf_mobilenetv2_quant
     mv mobilenet_v2_1.0_224_quant* ./tf_mobilenetv2_quant
+    cp tf_mobilenetv2_quant/mobilenet_v2_1.0_224_quant.tflite tf_mobilenetv2_quant/tf_mobilenetv2_quant.tflite
 
     # mnasnet 1.0 224
-    tar -zxvf mnasnet_1.0_224_09_07_2018.tgz
-    mkdir tf_mnasnet_1.0_224
-    mv mnasnet* ./tf_mnasnet_1.0_224
+    # TODO(ysh329): something wrong with not completed tar file
+    #tar -zxvf mnasnet_1.0_224_09_07_2018.tgz
+    #mkdir tf_mnasnet_1.0_224
+    #mv mnasnet* ./tf_mnasnet_1.0_224
 }
 
 function prepare_tensorflow_models() {

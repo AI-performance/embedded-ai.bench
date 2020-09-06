@@ -246,7 +246,10 @@ class Engine:
                     or self.config["framework_name"] == "tnn"
                 ):
                     model_param = model_proto.replace("tnnproto", "tnnmodel")
-                elif self.config["framework_name"] == "mnn":
+                elif (
+                    self.config["framework_name"] == "mnn"
+                    or self.config["framework_name"] == "tflite"
+                ):
                     model_param = None
                 else:
                     logger.fatal(
@@ -323,7 +326,7 @@ class Engine:
                 push_shared_lib_cmds = map(
                     lambda lib, lib_device: "adb -s {} push {} {}".format(  # noqa
                         device_serial, lib, lib_device
-                    ),
+                    ),  # noqa
                     benchmark_libs,
                     benchmark_lib_device_paths,
                 )
@@ -471,17 +474,18 @@ class Engine:
         # note(ysh329): this bench_dict is for single thread about device
         bench_dict = dict()
         bench_dict[device_serial] = dict()
-        has_cpu_backend = True in list(
+        cpu_backend_num = list(
             map(self.config["is_cpu_backend"], support_backend)
-        )
+        ).count(True)
         bench_case_num = (
             len(platforms)
             * len(model_names)
             * sum(
                 [
-                    len(self.config["cpu_thread_num"])
-                    if has_cpu_backend
-                    else 0 + len(set(support_backend) - set("ARM"))
+                    len(self.config["cpu_thread_num"]) * cpu_backend_num
+                    + len(
+                        set(support_backend) - set("ARM") - set("ARM_XNNPACK")
+                    )  # noqa
                 ]
             )
         )
@@ -528,7 +532,6 @@ class Engine:
                 # backend: cpu/gpu/xpu/...
                 for bidx in range(len(support_backend)):
                     backend = support_backend[bidx]
-                    is_cpu = self.config["is_cpu_backend"]
                     logger.debug("bidx:{}, backend:{}".format(bidx, backend))  # noqa
                     bench_dict[device_serial][platform][model_name][
                         backend
@@ -536,7 +539,7 @@ class Engine:
                     # thread: 1/2/4/...
                     for tidx in range(
                         len(self.config["cpu_thread_num"])
-                        if is_cpu(backend)
+                        if self.config["is_cpu_backend"](backend)
                         else 1  # noqa
                     ):
                         bench_case_idx += 1
@@ -552,7 +555,11 @@ class Engine:
                                 thread_num,  # noqa
                             )  # noqa
                         )
-                        cpu_thread_num = self.config["cpu_thread_num"][tidx]  # noqa
+                        cpu_thread_num = (
+                            self.config["cpu_thread_num"][tidx]
+                            if self.config["is_cpu_backend"](backend)
+                            else 1
+                        )  # noqa
                         bench_dict[device_serial][platform][model_name][  # noqa
                             backend
                         ][
@@ -607,6 +614,30 @@ class Engine:
                                     # power_mode: big_core default
                                 }
                             )
+                        elif self.config["framework_name"] == "tflite":
+                            # {device_benchmark_bin} --graph={model_dir}
+                            # --output_prefix={model_name}
+                            # --num_runs={repeats} --warmup_runs={warmup}
+                            # --num_threads={thread_num} {backend}
+                            bench_cmd = bench_cmd_pattern.format(
+                                **{
+                                    "serial_num": device_serial,
+                                    "device_work_dir": device_work_dir_platform,  # noqa
+                                    "device_benchmark_bin": device_benchmark_bin,  # noqa
+                                    "model_dir": model_dir,
+                                    "model_name": model_name,
+                                    "repeats": self.config["repeats"](backend),  # noqa
+                                    "warmup": self.config["warmup"],
+                                    "thread_num": cpu_thread_num,
+                                    "backend": self.config[
+                                        "support_backend_cmd_id"
+                                    ](  # noqa
+                                        backend
+                                    ),
+                                    # power_mode(TODO): no bind deafault? need explore deeply  # noqa
+                                }
+                            )
+                            print(bench_cmd)
                         else:
                             logger.fatal(
                                 "Unsupported framework {}".format(
@@ -685,8 +716,12 @@ class Engine:
         benchmark["std_dev"] = 0.0
         if cmd_res is None:
             return benchmark
-        elif framework_name == "tnn" or framework_name == "mnn":
-            if framework_name == "tnn":
+        elif (
+            framework_name == "tnn"
+            or framework_name == "mnn"
+            or framework_name == "tflite"
+        ):
+            if framework_name == "tnn" or framework_name == "tflite":
                 bench_res_keyword = "time cost"
             elif framework_name == "mnn":
                 bench_res_keyword = "max ="
@@ -697,6 +732,12 @@ class Engine:
             if (
                 framework_name == "mnn"
                 and "Floating point exception" in output_lines_str
+            ):
+                return benchmark
+            elif (
+                framework_name == "tflite"
+                and 'Error: dlopen failed: library "libhexagon_interface.so" not found'  # noqa
+                in output_lines_str
             ):
                 return benchmark
             output_lines = list(output_lines)
@@ -978,7 +1019,7 @@ class TestEngine(unittest.TestCase):
         return 0
     """
 
-    # """
+    """
     def test_mnn_engine(self):
         from core.global_config import create_config
 
@@ -1011,8 +1052,39 @@ class TestEngine(unittest.TestCase):
         logger.info("summary_str:\n{}".format(summary_str))
         mnn.write_list_to_file(summary_list)
         return 0
+    """
 
-    # """
+    def test_tflite_engine(self):
+        from core.global_config import create_config
+
+        framework_name = "tflite"
+        config_dict = create_config(framework_name)
+        config_dict["work_dir"] = os.getcwd() + "/../tflite"
+
+        tflite = Engine(config_dict)
+        tflite.set_config("benchmark_platform", ["android-armv7"])  # noqa
+        tflite.set_config(
+            "support_backend",
+            ["ARM", "ARM_XNNPACK", "GPU_CL_GL", "DSP_HEXAGON"],  # noqa
+        )  # ARM，ARM_XNNPACK, GPU_CL_GL, DSP_HEXAGON
+        tflite.set_config("cpu_thread_num", [1, 2, 4])  # [1, 2, 4]
+        model_dict = tflite.prepare_models()
+        device_dict = tflite.prepare_devices()
+        if len(device_dict) == 0:
+            logger.error("no device found")
+            return 0
+        config_dict = tflite.set_config("model_dict", model_dict)
+        config_dict = tflite.set_config("device_dict", device_dict)
+
+        tflite.prepare_models_for_devices()
+        tflite.prepare_benchmark_assets_for_devices()
+
+        bench_dict = tflite.run_bench()
+        summary_list = tflite.generate_benchmark_summary(bench_dict)
+        summary_str = "\n".join(summary_list)
+        logger.info("summary_str:\n{}".format(summary_str))
+        tflite.write_list_to_file(summary_list)
+        return 0
 
 
 if __name__ == "__main__":

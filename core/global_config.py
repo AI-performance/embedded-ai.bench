@@ -9,14 +9,14 @@ from utils.log import LoggerCreator  # noqa
 ##############################
 # Global Config
 ##############################
-log_enable_debug = False
+log_enable_debug = True
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
 
-GPU_REPEATS = 1000  # 1000
-CPU_REPEATS = 10  # 100
+GPU_REPEATS = 1  # 1000
+CPU_REPEATS = 2  # 100
 WARMUP = 20  # 20
-ENABLE_MULTI_THREADS_BENCH = True  # accelerate benchmark
+ENABLE_MULTI_THREADS_BENCH = False  # accelerate benchmark
 
 MAX_TIMEOUT_SECOND = 10  # 10, not used for infer command
 MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5  # used to calc MAX_TIMEOUT_SECOND
@@ -282,6 +282,86 @@ def create_config(framework_name):
             "{device_benchmark_bin} {model_dir} {repeats} {warmup} "
             '{forwardtype} {thread_num}"'  # {precision}"'
         )
+    #############################
+    # TFLite config
+    #############################
+    elif framework_name == "tflite":
+        # note(ysh329): https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark  # noqa
+        config["work_dir"] = "./{}".format(framework_name)
+
+        # ARM, ARM_XNNPACK, GPU_CL_GL, DSP_HEXAGON
+        def backend_to_repeats(backend):
+            backend = str(backend).upper()
+            if backend == "GPU_CL_GL" or backend == "DSP_HEXAGON":
+                return GPU_REPEATS
+            else:  # CPU, CPU_XNNPACK
+                return CPU_REPEATS
+
+        config["repeats"] = backend_to_repeats
+        config["engine_repo"] = "https://github.com/tensorflow/tensorflow.git"
+        config[
+            "model_repo"
+        ] = "https://github.com/ai-performance/{}-models.git".format(  # noqa
+            framework_name  # noqa
+        )
+        config["model_type_keyword"] = framework_name
+        # complete model version during `prepare_models`
+        config["model_repo_version"] = -1
+        config["model_repo_version_extra"] = -1
+        config["model_repo_branch"] = -1
+        config["model_repo_commit_id"] = -1
+        config["device_work_dir"] = "/data/local/tmp/ai-performance/{}".format(
+            framework_name
+        )
+        # complete framework version
+        config["framework_repo_branch"] = -1
+        config["framework_repo_commit_id"] = -1
+        config["framework_name"] = framework_name
+        config["benchmark_platform"] = benchmark_platform
+        for pidx in range(len(benchmark_platform)):
+            platform = benchmark_platform[pidx]
+            config[platform] = dict()
+            config[platform]["shared_lib"] = []  # use static library
+            config[platform][
+                "benchmark_bin"
+            ] = "./tflite/bazel-tflite/bazel-out/{}/bin/tensorflow/lite/tools/benchmark/benchmark_model".format(  # noqa
+                "armeabi-v7a-opt" if "v7" in platform else "arm64-v8a-opt"
+            )
+
+        def support_backend_cmd_id(backend):  # str_to_cmd
+            backend_cmd_param = " "  # use cpu by default, without xnnpack
+            backend = str(backend).upper()
+            backend_cmd_dict = dict()
+            backend_cmd_dict["ARM_XNNPACK"] = " --use_xnnpack=true "
+            backend_cmd_dict["GPU_CL_GL"] = " --user_gpu=true "
+            backend_cmd_dict["DSP_HEXAGON"] = " --use_hexagon=true "
+            backend_cmd_dict["ARM"] = " #arm_cpu "
+            if backend in backend_cmd_dict.keys():
+                backend_cmd_param = backend_cmd_dict[backend]
+            return backend_cmd_param
+
+        config["support_backend_cmd_id"] = support_backend_cmd_id
+        config["support_backend_id"] = lambda input: input
+        config["support_backend"] = [
+            "ARM",
+            "ARM_XNNPACK",
+            "GPU_CL_GL",
+            "DSP_HEXAGON",
+        ]  # noqa
+        config["is_cpu_backend"] = (
+            lambda b: str(b).upper() == "ARM" or str(b).upper() == "ARM_XNNPACK"  # noqa
+        )  # noqa
+        config["cpu_thread_num"] = [1, 2, 4]
+        # power_mode: "big_cores" # "little_cores", "no_bind"
+        config["power_mode"] = "no_bind"  # power_mode not provided
+        config["bench_cmd_pattern"] = (
+            "adb -s {serial_num} shell "
+            "{device_benchmark_bin} --graph={model_dir} "
+            " --output_prefix={model_name} "
+            "--num_runs={repeats} --warmup_runs={warmup} "
+            "--num_threads={thread_num} {backend}"
+        )
+
     else:
         logger.info("Unsupported framework_name: {}".format(framework_name))
         exit(1)

@@ -52,18 +52,10 @@ void BenchmarkLoggingListener::OnBenchmarkEnd(const BenchmarkResults& results) {
   auto init_mem_usage = results.init_mem_usage();
   auto overall_mem_usage = results.overall_mem_usage();
 
-  double time_std_dev_ms = 0.;
-  double time_avg_ms = inference_us.avg() / 1000.;
-  for (size_t i = 0; i < inference_us.count(); ++i) {
-    time_std_dev_ms += pow((inference_us[i] / 1000. - time_avg_ms), 2);
-  }
-  time_std_dev_ms = sqrt(time_std_dev_ms / inference_us.count());
-
-  std::cout << params_.Get<std::string>("output_prefix")
-            << " min=" << inference_us.min() / 1000.
+  std::cout << " min=" << inference_us.min() / 1000.
             << " max=" << inference_us.max() / 1000.
             << " avg=" << inference_us.avg() / 1000.
-            << " std_dev=" << time_std_dev_ms
+            << " std_dev=" << inference_us.std_deviation() / 1000.
             << std::endl;
   TFLITE_LOG(INFO) << "Inference timings in us: "
                    << "Init: " << init_us << ", "

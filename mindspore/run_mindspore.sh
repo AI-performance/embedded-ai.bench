@@ -9,4 +9,4 @@ adb push ./lib/liboptimize.so /data/local/tmp/mindspore/liboptimize.so
 adb push ./lib/libc++_shared.so /data/local/tmp/mindspore/libc++_shared.so
 
 adb shell chmod +x /data/local/tmp/mindspore/benchmark
-adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; /data/local/tmp/mindspore/benchmark"
+adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; /data/local/tmp/mindspore/benchmark --modelPath=<xxx> --device=<CPU|GPU> --cpuBindMode=<-1:midcore, 1: bigcore, 0:nobind> --numThreads=<2> --loopCount=10 --warmUpLoopCount=3 --fp16Priority=<false|true>"

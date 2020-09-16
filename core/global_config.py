@@ -15,11 +15,11 @@ logger = logger_creator.create_logger()
 
 GPU_REPEATS = 1  # 1000
 CPU_REPEATS = 2  # 100
-WARMUP = 20  # 20
+WARMUP = 2  # 20
 ENABLE_MULTI_THREADS_BENCH = False  # accelerate benchmark
 
 MAX_TIMEOUT_SECOND = 10  # 10, not used for infer command
-MAX_TIMEOUT_SECOND_ONCE_INFER = 0.5  # used to calc MAX_TIMEOUT_SECOND
+MAX_TIMEOUT_SECOND_ONCE_INFER = 0.7  # used to calc MAX_TIMEOUT_SECOND, TFLite GPU backend need more time to init  # noqa
 
 
 def create_config(framework_name):

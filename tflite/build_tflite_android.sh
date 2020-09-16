@@ -48,15 +48,21 @@ cd ${TFLITE_DIR}/tflite
 # android: y
 # ndk path: /opt/android-ndk-r17c/
 
+# build for armv7
 bazel build -c opt \
   --config=android_arm \
   tensorflow/lite/tools/benchmark:benchmark_model \
   --verbose_failures
+bazel build --config=android_arm \
+  tensorflow/lite/delegates/hexagon/hexagon_nn:libhexagon_interface.so
 # bazel-tflite/bazel-out/arm64-v8a-opt/bin/tensorflow/lite/tools/benchmark/benchmark_model
 
 
+# build for armv8
 bazel build -c opt \
   --config=android_arm64 \
   tensorflow/lite/tools/benchmark:benchmark_model \
   --verbose_failures
+bazel build --config=android_arm64 \
+  tensorflow/lite/delegates/hexagon/hexagon_nn:libhexagon_interface.so
 # bazel-tflite/bazel-out/arm64-v8a-opt/bin/tensorflow/lite/tools/benchmark/benchmark_model

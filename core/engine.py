@@ -438,10 +438,11 @@ class Engine:
             device_threads[ser].join()
 
         bench_dict = dict()
-        bench_dict[ser] = dict()
+        # bench_dict[ser] = dict()
         for tidx in range(len(device_threads)):
             ser = device_serials[tidx]
-            bench_dict[ser] = device_threads[ser].get_result()[ser]
+            res = device_threads[ser].get_result()
+            bench_dict[ser] = res[ser]
         return bench_dict
 
     def run_bench_for_single_thread_func(
@@ -554,7 +555,9 @@ class Engine:
                     ):
                         bench_case_idx += 1
                         logger.info(
-                            "\n\nframework_name:{}, device_idx(from1):{}/{}, bench_case_idx(from1):{}/{}, enable_multi_threads:{}, thread_idx(from0):{}/{}".format(  # noqa
+                            "\n\nframework_name:{}, device_idx(from1):{}/{}, bench_case_idx(from1):{}/{},"  # noqa
+                            " enable_multi_threads:{}, thread_idx(from0):{}/{}".format(  # noqa
+                                # noqa
                                 self.engine_name(),  # noqa
                                 device_idx + 1,
                                 len(device_dict),  # noqa

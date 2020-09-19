@@ -162,6 +162,7 @@ def get_soc_info_from_soc_code(soc_code):
             "name": "Helio P10 MT6755/6755M",
             "cpu": "2xA53@1.8+6xA53",
             "gpu": "Mali-T860@700 MP2",
+            "npu/apu/xpu/dsp": "",
         },
     }
     cur_soc_dict = dict()

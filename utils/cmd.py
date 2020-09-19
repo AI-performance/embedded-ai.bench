@@ -26,8 +26,11 @@ def run_cmd(cmd, wait_interval_sec=5, max_timeout_sec=MAX_TIMEOUT_SECOND):
         subp.wait(max_timeout_sec)
     except subprocess.TimeoutExpired:
         logger.error(
-            "TimeoutExpired {} seconds: {}".format(max_timeout_sec, cmd)  # noqa  # noqa
+            "TimeoutExpired {} seconds: {}, let's kill this subprocess".format(
+                max_timeout_sec, cmd
+            )  # noqa
         )
+        subp.kill()
         return None
 
     subp_status = -1

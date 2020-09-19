@@ -11,7 +11,7 @@ adb push ./lib/libc++_shared.so /data/local/tmp/mindspore/libc++_shared.so
 adb push /Users/yuanshuai06/Baidu/code/dl-inference-benchmark/mindspore/mindspore-models/tf_mobilenetv1.ms /data/local/tmp/mindspore/tf_mobilenetv1.ms
 adb push /Users/yuanshuai06/Baidu/code/dl-inference-benchmark/mindspore/mindspore-models/tf_mobilenetv2.ms /data/local/tmp/mindspore/tf_mobilenetv2.ms
 adb push /Users/yuanshuai06/Baidu/code/dl-inference-benchmark/mindspore/mindspore-models/caffe_mobilenetv1.ms /data/local/tmp/mindspore/caffe_mobilenetv1.ms
-adb push /Users/yuanshuai06/Baidu/code/dl-inference-benchmark/mindspore/mindspore-models/caffe_mobilenetv1.ms /data/local/tmp/mindspore/caffe_mobilenetv1.ms
+adb push /Users/yuanshuai06/Baidu/code/dl-inference-benchmark/mindspore/mindspore-models/caffe_mobilenetv2.ms /data/local/tmp/mindspore/caffe_mobilenetv2.ms
 
 adb shell chmod +x /data/local/tmp/mindspore/benchmark
 
@@ -29,7 +29,7 @@ adb shell chmod +x /data/local/tmp/mindspore/benchmark
 adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; \
   /data/local/tmp/mindspore/benchmark \
   --modelPath=/data/local/tmp/mindspore/tf_mobilenetv1.ms \
-  --device=GPU \
+  --device=CPU \
   --cpuBindMode=1 \
   --numThreads=1 \
   --loopCount=1000 \
@@ -38,12 +38,30 @@ adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; \
 
 adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; \
   /data/local/tmp/mindspore/benchmark \
-  --modelPath=/data/local/tmp/mindspore/tf_mobilenetv1.ms \
-  --device=GPU \
+  --modelPath=/data/local/tmp/mindspore/tf_mobilenetv2.ms \
+  --device=CPU \
   --cpuBindMode=1 \
   --numThreads=1 \
   --loopCount=1000 \
   --warmUpLoopCount=20 \
-  --fp16Priority=false"
+  --fp16Priority=true"
 
+adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; \
+  /data/local/tmp/mindspore/benchmark \
+  --modelPath=/data/local/tmp/mindspore/caffe_mobilenetv1.ms \
+  --device=CPU \
+  --cpuBindMode=1 \
+  --numThreads=1 \
+  --loopCount=1000 \
+  --warmUpLoopCount=20 \
+  --fp16Priority=true"
 
+adb shell "export LD_LIBRARY_PATH=/data/local/tmp/mindspore/; \
+  /data/local/tmp/mindspore/benchmark \
+  --modelPath=/data/local/tmp/mindspore/caffe_mobilenetv2.ms \
+  --device=CPU \
+  --cpuBindMode=1 \
+  --numThreads=1 \
+  --loopCount=1000 \
+  --warmUpLoopCount=20 \
+  --fp16Priority=true"

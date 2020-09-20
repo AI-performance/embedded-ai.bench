@@ -29,6 +29,7 @@ def main():
     bench("tnn")
     bench("ncnn")
     bench("mnn")
+    bench("tflite")
 
 
 if __name__ == "__main__":

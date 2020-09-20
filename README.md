@@ -16,17 +16,22 @@
 ```shell
 # tnn
 cd ./tnn
-./build_tnn_android.sh
+./build_tnn_android.sh  # follow & read `./tnn/build_tnn_android.sh` if build failed
 cd -
 
 # mnn
 cd ./mnn
-./build_mnn_android.sh
+./build_mnn_android.sh  # follow & read `./mnn/build_mnn_android.sh` if build failed
 cd -
 
 # ncnn
 cd ./ncnn
-./build_ncnn_android.sh
+./build_ncnn_android.sh  # follow & read `./ncnn/build_ncnn_android.sh` if build failed 
+cd -
+
+# tflite
+cd ./tflite
+./build_tflite_android.sh  # follow & read `./tflite/build_tflite_android.sh` if build failed
 cd -
 
 # bench

@@ -438,10 +438,17 @@ class Engine:
             device_threads[ser].join()
 
         bench_dict = dict()
-        # bench_dict[ser] = dict()
         for tidx in range(len(device_threads)):
             ser = device_serials[tidx]
             res = device_threads[ser].get_result()
+            if res is None:
+                # TODO(ysh329): need watch out for failed device
+                #  when benchmark some framework
+                logger.error(
+                    "device {} result is None,"
+                    " skipped and continue".format(ser)  # noqa
+                )
+                continue
             bench_dict[ser] = res[ser]
         return bench_dict
 

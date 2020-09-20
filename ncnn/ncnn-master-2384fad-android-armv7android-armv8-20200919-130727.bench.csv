@@ -159,3 +159,19 @@ ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,exynos5,exynos 7872,2xA7
 ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,exynos5,exynos 7872,2xA73@2.0+4xA53@1.6,Mali-G71,,Meizu S6,big_cores,ARM,2,80.87,83.03,79.24,0.80,94,7.0,100,20,868260030121546
 ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,exynos5,exynos 7872,2xA73@2.0+4xA53@1.6,Mali-G71,,Meizu S6,big_cores,ARM,4,68.40,80.72,66.34,2.75,94,7.0,100,20,868260030121546
 ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,exynos5,exynos 7872,2xA73@2.0+4xA53@1.6,Mali-G71,,Meizu S6,big_cores,GPU_VULKAN,1,76.08,92.40,60.75,8.12,94,7.0,1000,20,868260030121546
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,1,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,2,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,4,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,GPU_VULKAN,1,0.0,0.0,0.0,0.0,99,5.1.1,1000,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,1,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,2,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,4,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv7,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,GPU_VULKAN,1,0.0,0.0,0.0,0.0,99,5.1.1,1000,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,1,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,2,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,4,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv1.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,GPU_VULKAN,1,0.0,0.0,0.0,0.0,99,5.1.1,1000,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,1,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,2,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,ARM,4,0.0,0.0,0.0,0.0,99,5.1.1,100,20,868026024882181
+ncnn,master,2384fad,caffe_mobilenetv2.opt,android-armv8,msm8916,SD410,4xA53@1.2,Adreno-306,HexagonDSP(QDSP6),ZTE B2015,big_cores,GPU_VULKAN,1,0.0,0.0,0.0,0.0,99,5.1.1,1000,20,868026024882181

@@ -74,7 +74,7 @@ def get_soc_info_from_soc_code(soc_code):
         },  # noqa
         "kirin810": {
             "name": "kirin810",
-            "cpu": "2×A76@2.27+6×A55@1.88",
+            "cpu": "2xA76@2.27+6xA55@1.88",
             "gpu": "Mali-G52",
             "npu/apu/xpu/dsp": "D100@Lite",
         },  # noqa
@@ -156,7 +156,7 @@ def get_soc_info_from_soc_code(soc_code):
         },  # noqa
         ###############################
         # MediaTek
-        # https://www.samsung.com/semiconductor/minisite/exynos/products/all-processors/
+        # http://www.mydrivers.com/zhuanti/tianti/01/index.html
         ###############################
         "mt6755": {
             "name": "Helio P10 MT6755/6755M",

@@ -13,13 +13,13 @@ log_enable_debug = True
 logger_creator = LoggerCreator(log_enable_debug)
 logger = logger_creator.create_logger()
 
-GPU_REPEATS = 1  # 1000
-CPU_REPEATS = 2  # 100
-WARMUP = 2  # 20
-ENABLE_MULTI_THREADS_BENCH = False  # accelerate benchmark
+GPU_REPEATS = 1000  # 1000
+CPU_REPEATS = 100  # 100
+WARMUP = 20  # 20
+ENABLE_MULTI_THREADS_BENCH = True  # accelerate benchmark
 
 MAX_TIMEOUT_SECOND = 10  # 10, not used for infer command
-MAX_TIMEOUT_SECOND_ONCE_INFER = 0.7  # used to calc MAX_TIMEOUT_SECOND, TFLite GPU backend need more time to init  # noqa
+MAX_TIMEOUT_SECOND_ONCE_INFER = 3.0  # 0.7  # used to calc MAX_TIMEOUT_SECOND, TFLite GPU backend need more time to init  # noqa
 
 
 def create_config(framework_name):
@@ -333,7 +333,7 @@ def create_config(framework_name):
             backend = str(backend).upper()
             backend_cmd_dict = dict()
             backend_cmd_dict["ARM_XNNPACK"] = " --use_xnnpack=true "
-            backend_cmd_dict["GPU_CL_GL"] = " --user_gpu=true "
+            backend_cmd_dict["GPU_CL_GL"] = " --use_gpu=true "
             backend_cmd_dict["DSP_HEXAGON"] = " --use_hexagon=true "
             backend_cmd_dict["ARM"] = " #arm_cpu "
             if backend in backend_cmd_dict.keys():

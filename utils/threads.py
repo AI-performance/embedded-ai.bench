@@ -42,8 +42,11 @@ class MyThread(threading.Thread):
         self.res = self.func(*self.args)
         self.end_time = ctime()
         logger.debug(
-            "end thread(from0) {} on device {} at {}".format(
-                self.thread_idx, self.device_serial, self.end_time
+            "finish thread(from0) {} on device {}, framework {} at {}".format(
+                self.thread_idx,
+                self.device_serial,
+                self.framework_name,
+                self.end_time,  # noqa
             )
         )
 

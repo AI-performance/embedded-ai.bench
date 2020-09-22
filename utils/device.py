@@ -10,6 +10,35 @@ from utils.cmd import run_cmd, run_cmds  # noqa
 from utils.misc import pattern_match  # noqa
 
 
+def cpu_idx_str_to_mask(cpu_idx_str_raw, power_mode):
+    if power_mode == "no_bind":
+        return " "
+    # TODO(ysh329):
+    str_cpu_idx_list = cpu_idx_str_raw.split(",")
+    str_cpu_idx_list = filter(lambda s: s != "", str_cpu_idx_list)
+    int_cpu_idx_list = map(int, str_cpu_idx_list)
+
+    cpu_mask_10 = 0
+    for cpu_idx in int_cpu_idx_list:
+        cpu_mask_10 += 2 ** cpu_idx
+
+    cpu_mask_hex_raw = hex(cpu_mask_10)
+    cpu_mask_hex_std_list = cpu_mask_hex_raw.split("x")
+
+    assert len(cpu_mask_hex_std_list) == 2
+    zero_num = 8 - len(cpu_mask_hex_std_list[1])
+    cpu_mask_hex_std = "0x" + zero_num * "0" + cpu_mask_hex_std_list[1]
+    logger.debug(
+        "cpu_idx_str_raw:{}, cpu_mask_10:{}, cpu_mask_hex_raw:{},"  # noqa
+        " cpu_mask_hex_std:{}".format(
+            cpu_idx_str_raw, cpu_mask_10, cpu_mask_hex_raw, cpu_mask_hex_std  # noqa
+        )
+    )  # noqa
+    # TODO(ysh329): can improve
+    cpu_mask_hex_std = " taskset " + cpu_mask_hex_std
+    return cpu_mask_hex_std
+
+
 def get_soc_info_from_soc_code(soc_code):
     ###############################
     # summ.: http://www.mydrivers.com/zhuanti/tianti/01/index.html

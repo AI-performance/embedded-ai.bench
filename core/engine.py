@@ -22,6 +22,7 @@ from utils.device import (  # noqa
     get_soc_code,
     get_soc_info_from_soc_code,
     get_product,
+    cpu_idx_str_to_mask,
 )  # noqa
 from utils.cmd import run_cmds, run_cmd  # noqa
 from utils.misc import pattern_match, get_file_name  # noqa
@@ -654,7 +655,13 @@ class Engine:
                                     ](  # noqa
                                         backend
                                     ),
-                                    # power_mode(TODO): no bind deafault? need explore deeply  # noqa
+                                    # power_mode
+                                    "power_mode_cpu_mask": cpu_idx_str_to_mask(  # noqa
+                                        device_dict[device_serial][
+                                            "bind_cpu_idx"
+                                        ],  # noqa
+                                        self.config["power_mode"],
+                                    ),  # noqa
                                 }
                             )
                             print(bench_cmd)

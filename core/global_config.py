@@ -355,7 +355,7 @@ def create_config(framework_name):
         # power_mode: "big_cores" # "little_cores", "no_bind"
         config["power_mode"] = "no_bind"  # power_mode not provided
         config["bench_cmd_pattern"] = (
-            "adb -s {serial_num} shell "
+            "adb -s {serial_num} shell {power_mode_cpu_mask} "
             "{device_benchmark_bin} --graph={model_dir} "
             " --output_prefix={model_name} "
             "--num_runs={repeats} --warmup_runs={warmup} "
@@ -384,7 +384,7 @@ class TestGlobalConfig(unittest.TestCase):
         )
 
     def test_config(self):
-        framework_list = ["tnn", "mnn", "ncnn"]
+        framework_list = ["tnn", "mnn", "ncnn", "tflite"]
         for fidx in range(len(framework_list)):
             framework = framework_list[fidx]
             framework_config = create_config(framework)

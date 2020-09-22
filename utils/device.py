@@ -97,7 +97,7 @@ def get_soc_info_from_soc_code(soc_code):
         ###############################
         "kirin710": {
             "name": "kirin710",
-            "cpu": "4×A73@2.2+4×A53@1.7",
+            "cpu": "4xA73@2.2+4xA53@1.7",
             "gpu": "Mali-G51",
             "npu/apu/xpu/dsp": "None",
         },  # noqa

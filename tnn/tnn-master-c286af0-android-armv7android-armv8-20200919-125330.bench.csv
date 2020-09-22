@@ -127,38 +127,38 @@ tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin980,kirin980,2xA76@2.6+
 tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin980,kirin980,2xA76@2.6+2xA76@1.92+4xA55@1.8,Mali-G76 MP10,Dual NPU,YAL-AL00,big_cores,ARM,2,13.312,13.399,13.242,0.030,100,9,100,20,A00000AD995AA1
 tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin980,kirin980,2xA76@2.6+2xA76@1.92+4xA55@1.8,Mali-G76 MP10,Dual NPU,YAL-AL00,big_cores,ARM,4,10.570,11.041,10.488,0.131,100,9,100,20,A00000AD995AA1
 tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin980,kirin980,2xA76@2.6+2xA76@1.92+4xA55@1.8,Mali-G76 MP10,Dual NPU,YAL-AL00,big_cores,GPU_OPENCL,1,20.665,25.571,16.697,1.602,100,9,1000,20,A00000AD995AA1
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,45.616,46.516,45.136,0.233,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,24.369,25.237,24.170,0.204,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,25.810,60.428,24.148,6.249,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,21.725,27.430,15.335,1.147,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,39.995,40.565,39.272,0.265,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,24.957,65.660,23.008,6.597,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,23.301,23.622,23.050,0.123,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,23.062,31.366,19.268,1.801,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,47.847,48.850,47.023,0.319,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,25.773,26.224,25.561,0.135,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,25.893,31.721,25.640,0.600,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,24.995,29.730,21.478,1.611,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,30.565,31.443,29.626,0.437,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,18.879,19.081,18.727,0.068,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,19.791,47.458,18.170,5.162,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,25.547,35.588,19.395,2.370,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,39.108,39.509,38.680,0.203,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,20.783,20.985,20.656,0.054,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,20.967,21.071,20.862,0.042,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,21.848,27.325,19.023,1.182,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,36.546,37.210,36.332,0.102,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,21.080,21.473,20.939,0.079,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,21.181,21.385,21.073,0.054,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,23.736,33.613,18.765,2.159,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,41.318,41.875,40.729,0.326,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,22.367,22.531,22.276,0.047,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,22.654,22.973,22.495,0.055,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,25.892,37.555,19.754,1.806,100,9,1000,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,28.320,28.473,28.199,0.054,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,17.072,17.576,16.724,0.119,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,17.195,17.449,17.038,0.078,100,9,100,20,A00000B7D25778
-tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2×A76@2.27+6×A55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,26.626,35.338,19.863,2.478,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,45.616,46.516,45.136,0.233,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,24.369,25.237,24.170,0.204,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,25.810,60.428,24.148,6.249,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,21.725,27.430,15.335,1.147,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,39.995,40.565,39.272,0.265,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,24.957,65.660,23.008,6.597,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,23.301,23.622,23.050,0.123,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,23.062,31.366,19.268,1.801,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,47.847,48.850,47.023,0.319,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,25.773,26.224,25.561,0.135,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,25.893,31.721,25.640,0.600,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,24.995,29.730,21.478,1.611,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,30.565,31.443,29.626,0.437,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,18.879,19.081,18.727,0.068,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,19.791,47.458,18.170,5.162,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv7,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,25.547,35.588,19.395,2.370,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,39.108,39.509,38.680,0.203,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,20.783,20.985,20.656,0.054,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,20.967,21.071,20.862,0.042,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,21.848,27.325,19.023,1.182,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,36.546,37.210,36.332,0.102,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,21.080,21.473,20.939,0.079,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,21.181,21.385,21.073,0.054,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,caffe_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,23.736,33.613,18.765,2.159,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,41.318,41.875,40.729,0.326,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,22.367,22.531,22.276,0.047,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,22.654,22.973,22.495,0.055,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv1.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,25.892,37.555,19.754,1.806,100,9,1000,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,1,28.320,28.473,28.199,0.054,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,2,17.072,17.576,16.724,0.119,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,ARM,4,17.195,17.449,17.038,0.078,100,9,100,20,A00000B7D25778
+tnn,master,c286af0,tf_mobilenetv2.opt,android-armv8,kirin810,kirin810,2xA76@2.27+6xA55@1.88,Mali-G52,D100@Lite,SPN-AL00,big_cores,GPU_OPENCL,1,26.626,35.338,19.863,2.478,100,9,1000,20,A00000B7D25778
 tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,msmnile,SD855,Kyro485:1xA76@2.84+3xA76@2.42+4xA55@1.8,Adreno-640@585,Hexagon-690,MI 9,big_cores,ARM,1,32.158,32.320,31.958,0.076,100,10,100,20,99001332379315
 tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,msmnile,SD855,Kyro485:1xA76@2.84+3xA76@2.42+4xA55@1.8,Adreno-640@585,Hexagon-690,MI 9,big_cores,ARM,2,19.405,20.080,19.293,0.116,100,10,100,20,99001332379315
 tnn,master,c286af0,caffe_mobilenetv1.opt,android-armv7,msmnile,SD855,Kyro485:1xA76@2.84+3xA76@2.42+4xA55@1.8,Adreno-640@585,Hexagon-690,MI 9,big_cores,ARM,4,38.676,211.158,19.666,27.655,100,10,100,20,99001332379315

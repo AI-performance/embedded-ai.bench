@@ -79,9 +79,15 @@ def get_soc_info_from_soc_code(soc_code):
             "gpu": "Adreno-306",
             "npu/apu/xpu/dsp": "HexagonDSP(QDSP6)",
         },  # noqa
+        "msm8996": {
+            "name": "SD820",
+            "cpu": "2xKyro@1.8+2xKyro@1.36",
+            "gpu": "Adreno-530@510",
+            "npu/apu/xpu/dsp": "Hexagon-680",
+        },  # noqa
         "msm8953": {
             "name": "SD625",
-            "cpu": "8×A53@2.0",
+            "cpu": "8xA53@2.0",
             "gpu": "Adreno-506",
             "npu/apu/xpu/dsp": "Hexagon-546",
         },  # noqa
